@@ -5,6 +5,8 @@ import com.team.leaf.user.account.entity.User;
 import jakarta.persistence.*;
 import lombok.Getter;
 
+import java.time.LocalDateTime;
+
 @Entity
 @Getter
 public class Order {
@@ -20,6 +22,8 @@ public class Order {
     private String commission;
 
     private String status;
+
+    private LocalDateTime orderDate;
 
     @OneToOne(cascade = CascadeType.PERSIST)
     private OrderDetail orderDetail;
