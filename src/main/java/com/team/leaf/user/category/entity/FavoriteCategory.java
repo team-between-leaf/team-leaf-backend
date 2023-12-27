@@ -1,10 +1,11 @@
 package com.team.leaf.user.category.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import com.team.leaf.shopping.product.category.entity.Category;
+import com.team.leaf.user.account.entity.User;
+import jakarta.persistence.*;
 import lombok.Getter;
+
+import java.util.List;
 
 @Entity
 @Getter
@@ -14,6 +15,10 @@ public class FavoriteCategory {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long favoriteCategoryId;
 
-    private String favoriteCategory;
+    @OneToMany
+    private List<User> users;
+
+    @OneToMany
+    private List<Category> categories;
 
 }

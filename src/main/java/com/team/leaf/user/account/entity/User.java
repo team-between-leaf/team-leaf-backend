@@ -46,7 +46,4 @@ public class User {
     @OneToMany(cascade = CascadeType.PERSIST, orphanRemoval = true)
     private List<SearchHistory> searchHistories;
 
-    @OneToMany(cascade = CascadeType.PERSIST, orphanRemoval = true)
-    private List<FavoriteCategory> favoriteCategories;
-
 }
