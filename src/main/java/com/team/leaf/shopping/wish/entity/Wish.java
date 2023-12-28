@@ -1,7 +1,7 @@
 package com.team.leaf.shopping.wish.entity;
 
 import com.team.leaf.shopping.product.product.entity.Product;
-import com.team.leaf.user.account.entity.User;
+import com.team.leaf.user.account.entity.AccountDetail;
 import jakarta.persistence.*;
 import lombok.Getter;
 
@@ -14,7 +14,7 @@ public class Wish {
     private long wishId;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    private User user;
+    private AccountDetail user;
 
     @ManyToOne(fetch = FetchType.LAZY)
     private Product product;

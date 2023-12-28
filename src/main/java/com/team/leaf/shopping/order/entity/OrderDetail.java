@@ -1,9 +1,8 @@
 package com.team.leaf.shopping.order.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import com.team.leaf.shopping.product.product.entity.Product;
+import com.team.leaf.user.account.entity.AccountDetail;
+import jakarta.persistence.*;
 import lombok.Getter;
 
 import java.time.LocalDateTime;
@@ -14,12 +13,25 @@ public class OrderDetail {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long orderDetailId;
+    private long orderId;
 
-    private String cardInfo;
+    private int count;
 
-    private LocalDateTime paymentRequest;
+    private int price;
 
-    private LocalDateTime paymentApproval;
+    private String commission;
+
+    private String status;
+
+    private LocalDateTime orderDate;
+
+    @OneToOne(cascade = CascadeType.PERSIST)
+    private OrderPaymentDetail orderDetail;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    private AccountDetail orderer;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    private Product product;
 
 }

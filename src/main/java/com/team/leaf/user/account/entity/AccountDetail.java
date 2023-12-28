@@ -1,6 +1,5 @@
 package com.team.leaf.user.account.entity;
 
-import com.team.leaf.user.category.entity.FavoriteCategory;
 import com.team.leaf.user.history.entity.SearchHistory;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -10,7 +9,7 @@ import java.util.List;
 
 @Entity
 @Getter
-public class User {
+public class AccountDetail {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -41,7 +40,7 @@ public class User {
     private int loginFailCount;
 
     @OneToOne(cascade = {CascadeType.PERSIST, CascadeType.REMOVE}, orphanRemoval = true)
-    private UserDetail userDetail;
+    private AccountPrivacy userDetail;
 
     @OneToMany(cascade = CascadeType.PERSIST, orphanRemoval = true)
     private List<SearchHistory> searchHistories;

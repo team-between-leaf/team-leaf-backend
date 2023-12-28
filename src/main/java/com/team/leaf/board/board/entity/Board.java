@@ -1,7 +1,7 @@
 package com.team.leaf.board.board.entity;
 
 import com.team.leaf.board.comment.entity.Comment;
-import com.team.leaf.user.account.entity.User;
+import com.team.leaf.user.account.entity.AccountDetail;
 import jakarta.persistence.*;
 import lombok.Getter;
 import org.hibernate.annotations.CreationTimestamp;
@@ -28,7 +28,7 @@ public class Board {
     private String image;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    private User writer;
+    private AccountDetail writer;
 
     @OneToMany(cascade = CascadeType.PERSIST, orphanRemoval = true)
     private List<Comment> comments;

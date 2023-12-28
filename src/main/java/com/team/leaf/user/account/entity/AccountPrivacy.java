@@ -7,7 +7,7 @@ import java.time.LocalDate;
 
 @Entity
 @Getter
-public class UserDetail {
+public class AccountPrivacy {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

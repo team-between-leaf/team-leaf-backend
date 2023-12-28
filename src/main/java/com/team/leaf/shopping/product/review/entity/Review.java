@@ -1,6 +1,6 @@
 package com.team.leaf.shopping.product.review.entity;
 
-import com.team.leaf.user.account.entity.User;
+import com.team.leaf.user.account.entity.AccountDetail;
 import jakarta.persistence.*;
 import lombok.Getter;
 import org.hibernate.annotations.CreationTimestamp;
@@ -23,7 +23,7 @@ public class Review {
     private LocalDateTime reviewDate;
 
     @OneToOne
-    private User writer;
+    private AccountDetail writer;
 
     private String orderType;
 

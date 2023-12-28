@@ -1,6 +1,6 @@
 package com.team.leaf.board.comment.entity;
 
-import com.team.leaf.user.account.entity.User;
+import com.team.leaf.user.account.entity.AccountDetail;
 import jakarta.persistence.*;
 import lombok.Getter;
 import org.hibernate.annotations.CreationTimestamp;
@@ -21,6 +21,6 @@ public class Comment {
     private LocalDateTime replyDate;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    private User writer;
+    private AccountDetail writer;
 
 }
