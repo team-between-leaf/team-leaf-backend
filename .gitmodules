@@ -1,0 +1,3 @@
+[submodule "src/main/resources/backend-submodule"]
+	path = src/main/resources/backend-submodule
+	url = https://github.com/team-between-leaf/backend-submodule
