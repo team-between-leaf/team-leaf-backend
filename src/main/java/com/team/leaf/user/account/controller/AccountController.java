@@ -15,7 +15,7 @@ public class AccountController {
     private final AccountService accountService;
 
     @PostMapping("/account/join")
-    public ResponseEntity join(@RequestBody JoinRequest request) {
+    public ResponseEntity join(@RequestBody JoinRequest request) throws Exception {
         accountService.signUpAccount(request);
 
         return ResponseEntity.ok().build();
