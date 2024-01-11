@@ -2,13 +2,16 @@ package com.team.leaf.user.account.entity;
 
 import com.team.leaf.user.history.entity.SearchHistory;
 import jakarta.persistence.*;
-import lombok.Getter;
+import lombok.*;
 
 import java.time.LocalDate;
 import java.util.List;
 
 @Entity
 @Getter
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class AccountDetail {
 
     @Id
