@@ -1,6 +1,7 @@
 package com.team.leaf.user.account.entity;
 
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Getter;
 
 import java.time.LocalDate;
