@@ -7,6 +7,7 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import static com.team.leaf.common.message.ResponseMessage.ACCOUNT_EXISTS;
 import static com.team.leaf.common.message.ResponseMessage.MISMATCHED_ACCOUNT;
 
 @Service
@@ -17,6 +18,10 @@ public class AccountService {
 
     @Transactional
     public void signUpAccount(JoinRequest request) {
+        if(accountRepository.findByEmail(request.getEmail()).isPresent()) {
+            new Exception(ACCOUNT_EXISTS.getMessage());
+        }
+
         AccountDetail detail = AccountDetail.builder()
                 .email(request.getEmail())
                 .password(request.getPassword())
