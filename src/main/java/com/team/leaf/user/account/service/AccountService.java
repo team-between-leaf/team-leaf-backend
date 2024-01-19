@@ -1,7 +1,9 @@
 package com.team.leaf.user.account.service;
 
-import com.team.leaf.user.account.dto.JoinRequest;
+import com.team.leaf.user.account.dto.AccountRequest;
+import com.team.leaf.user.account.dto.AccountResponse;
 import com.team.leaf.user.account.entity.AccountDetail;
+import com.team.leaf.user.account.exception.AccountException;
 import com.team.leaf.user.account.repository.AccountRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -19,10 +21,10 @@ public class AccountService {
     private final AccountRepository accountRepository;
 
     @Transactional
-    public void signUpAccount(JoinRequest request) throws Exception {
+    public void signUpAccount(AccountRequest request) {
         Optional<AccountDetail> user = accountRepository.findByEmail(request.getEmail());
         if(user.isPresent()) {
-            throw new Exception(ACCOUNT_EXISTS.getMessage());
+            throw new AccountException(ACCOUNT_EXISTS.getMessage());
         }
 
         AccountDetail detail = AccountDetail.builder()
@@ -33,14 +35,20 @@ public class AccountService {
         accountRepository.save(detail);
     }
 
-    public JoinRequest login(JoinRequest request) throws Exception {
-        AccountDetail data = accountRepository.findByEmail(request.getEmail())
-                .orElseThrow(() -> new Exception(MISMATCHED_ACCOUNT.getMessage()));
+    public AccountResponse login(AccountRequest request) {
+        AccountDetail account = findAccountById(request.getEmail());
 
-        if(!data.getPassword().equals(request.getPassword())) {
-            throw new Exception(MISMATCHED_ACCOUNT.getMessage());
+        if(!account.getPassword().equals(request.getPassword())) {
+            throw new AccountException(MISMATCHED_ACCOUNT.getMessage());
         }
 
-        return JoinRequest.createRequest(data);
+        return AccountResponse.createRequest(account);
+    }
+
+    public AccountDetail findAccountById(String email) {
+        AccountDetail account = accountRepository.findByEmail(email)
+                .orElseThrow(() -> new AccountException(MISMATCHED_ACCOUNT.getMessage()));
+
+        return account;
     }
 }
