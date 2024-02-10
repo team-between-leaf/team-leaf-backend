@@ -1,9 +1,12 @@
 package com.team.leaf.user.account.controller;
 
+import com.team.leaf.user.account.dto.AccountResponse;
 import com.team.leaf.user.account.dto.request.JoinRequest;
 import com.team.leaf.user.account.dto.request.LoginRequest;
+import com.team.leaf.user.account.dto.response.AccountDto;
 import com.team.leaf.user.account.dto.response.LoginAccountDto;
 import com.team.leaf.user.account.dto.response.GlobalResDto;
+import com.team.leaf.user.account.entity.AccountDetail;
 import com.team.leaf.user.account.exception.ApiResponse;
 import com.team.leaf.user.account.jwt.JwtTokenUtil;
 import com.team.leaf.user.account.jwt.PrincipalDetails;
@@ -54,6 +57,13 @@ public class AccountController {
     public GlobalResDto issuedToken(@AuthenticationPrincipal PrincipalDetails userDetails, @RequestHeader(value = "Authorization") String authorizationHeader, HttpServletResponse response) {
         response.addHeader(JwtTokenUtil.ACCESS_TOKEN, jwtTokenUtil.createToken(userDetails.getAccountDetail().getEmail(), "Access"));
         return new GlobalResDto("Success IssuedToken", HttpStatus.OK.value());
+    }
+
+    @GetMapping("/{userEmail}")
+    public ResponseEntity findAccountById(@PathVariable String userEmail) {
+        AccountDto account = accountService.getAccount(userEmail);
+
+        return ResponseEntity.ok(account);
     }
 
 }
