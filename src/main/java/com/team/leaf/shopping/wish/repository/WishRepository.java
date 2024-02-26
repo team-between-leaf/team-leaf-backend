@@ -7,9 +7,9 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import java.util.List;
 public interface WishRepository extends JpaRepository<Wish, Long> {
-    @Modifying
-    @Query("DELETE FROM Wish w WHERE w.user.id = :userId AND w.product.id = :productId")
-    int deleteByUserIdAndProductId(@Param("userId") Long userId,@Param("productId") Long productId);
+    int deleteByUserUserIdAndProductProductId(Long userId, Long productId);
 
     List<Wish> findAllByUserUserId(Long userId);
+
+    boolean existsByUserUserIdAndProductProductId(Long userId, Long productId);
 }
