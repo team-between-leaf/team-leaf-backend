@@ -37,10 +37,10 @@ public class AccountController {
         return new ApiResponse<>(accountService.join(joinRequest));
     }
 
-    /*@GetMapping(value = "/join/{phone}")
+    @GetMapping(value = "/join/{phone}")
     public ResponseEntity<Boolean> phoneCheck(@PathVariable String phone) {
         return ResponseEntity.ok(accountService.checkPhoneDuplicate(phone));
-    }*/
+    }
 
     @PostMapping("/login")
     public ApiResponse<LoginAccountDto> login(@RequestBody @Valid LoginRequest loginRequest, HttpServletResponse response) {
