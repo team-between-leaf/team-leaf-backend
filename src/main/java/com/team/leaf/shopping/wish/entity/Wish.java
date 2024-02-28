@@ -3,10 +3,16 @@ package com.team.leaf.shopping.wish.entity;
 import com.team.leaf.shopping.product.product.entity.Product;
 import com.team.leaf.user.account.entity.AccountDetail;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Getter
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class Wish {
 
     @Id
@@ -20,5 +26,13 @@ public class Wish {
     private Product product;
 
     private int amount;
+
+    public static Wish createWish(AccountDetail accountDetail, Product product) {
+        return Wish.builder()
+                .user(accountDetail)
+                .product(product)
+                .amount(1)
+                .build();
+    }
 
 }
