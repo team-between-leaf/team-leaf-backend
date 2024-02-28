@@ -1,12 +1,10 @@
 package com.team.leaf.user.account.controller;
 
-import com.team.leaf.user.account.dto.AccountResponse;
 import com.team.leaf.user.account.dto.request.JoinRequest;
 import com.team.leaf.user.account.dto.request.LoginRequest;
 import com.team.leaf.user.account.dto.response.AccountDto;
-import com.team.leaf.user.account.dto.response.LoginAccountDto;
 import com.team.leaf.user.account.dto.response.GlobalResDto;
-import com.team.leaf.user.account.entity.AccountDetail;
+import com.team.leaf.user.account.dto.response.LoginAccountDto;
 import com.team.leaf.user.account.exception.ApiResponse;
 import com.team.leaf.user.account.jwt.JwtTokenUtil;
 import com.team.leaf.user.account.jwt.PrincipalDetails;
@@ -18,7 +16,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
