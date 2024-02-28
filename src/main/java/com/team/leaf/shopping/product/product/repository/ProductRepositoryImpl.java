@@ -26,12 +26,14 @@ public class ProductRepositoryImpl implements CustomProductRepository {
                         product.price,
                         product.image,
                         product.registrationDate,
+                        product.saleRate,
                         product.views,
                         product.discountRate,
                         review.score.avg()
                 ))
                 .from(product)
-                .groupBy(product.reviews, review)
+                .leftJoin(product.reviews, review)
+                .groupBy(product.productId)
                 .orderBy(request.getSortType().getSort())
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
@@ -47,14 +49,16 @@ public class ProductRepositoryImpl implements CustomProductRepository {
                         product.price,
                         product.image,
                         product.registrationDate,
+                        product.saleRate,
                         product.views,
                         product.discountRate,
                         review.score.avg()
                 ))
                 .from(product)
-                .groupBy(product.reviews, review)
+                .leftJoin(product.reviews, review)
+                .groupBy(product.productId)
                 .orderBy(request.getSortType().getSort())
-                .where(product.title.eq(search))
+                .where(product.title.contains(search))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetch();

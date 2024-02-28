@@ -23,6 +23,8 @@ public class ProductResponse {
     @JsonFormat(shape = JsonFormat.Shape.STRING , pattern = "yyyy-MM-dd HH:MM:SS" , timezone = "Asia/Seoul")
     private LocalDateTime registrationDate;
 
+    private long saleRate;
+
     private long views;
 
     private double discountRate;

@@ -17,7 +17,7 @@ public class ProductController {
     private final ProductService productService;
 
     @GetMapping("/product")
-    public ApiResponse getAllProduct(Pageable pageable, ProductRequest request) {
+    public ApiResponse getAllProduct(Pageable pageable, @RequestBody ProductRequest request) {
 
         return new ApiResponse(productService.getAllProduct(pageable, request));
     }
@@ -30,7 +30,7 @@ public class ProductController {
     }
 
     @GetMapping("/product/{search}")
-    public ApiResponse getAllProductBySearch(Pageable pageable, ProductRequest request, @PathVariable String search) {
+    public ApiResponse getAllProductBySearch(Pageable pageable, @RequestBody ProductRequest request, @PathVariable String search) {
 
         return new ApiResponse(productService.getAllProductBySearch(pageable, request, search));
     }

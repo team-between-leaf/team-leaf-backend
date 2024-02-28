@@ -1,5 +1,6 @@
 package com.team.leaf.shopping.product.review.entity;
 
+import com.team.leaf.shopping.product.product.entity.Product;
 import com.team.leaf.user.account.entity.AccountDetail;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -25,6 +26,10 @@ public class Review {
     @OneToOne
     private AccountDetail writer;
 
+    @ManyToOne
+    private Product product;
+
     private String orderType;
+
 
 }
