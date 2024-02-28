@@ -1,5 +1,6 @@
 package com.team.leaf.shopping.product.product.service;
 
+import com.team.leaf.shopping.product.product.dto.ProductRequest;
 import com.team.leaf.shopping.product.product.dto.ProductResponse;
 import com.team.leaf.shopping.product.product.entity.Product;
 import com.team.leaf.shopping.product.product.repository.ProductRepository;
@@ -20,9 +21,9 @@ public class ProductService {
     private final ProductRepository productRepository;
     private final WishRepository wishRepository;
 
-    public List<ProductResponse> getAllProduct(Pageable pageable) {
+    public List<ProductResponse> getAllProduct(Pageable pageable, ProductRequest request) {
 
-        return productRepository.getAllProduct(pageable);
+        return productRepository.getAllProduct(pageable, request);
     }
 
     public void addWishList(PrincipalDetails detail,long productId) {

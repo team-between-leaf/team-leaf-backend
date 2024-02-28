@@ -1,5 +1,6 @@
 package com.team.leaf.shopping.product.product.controller;
 
+import com.team.leaf.shopping.product.product.dto.ProductRequest;
 import com.team.leaf.shopping.product.product.service.ProductService;
 import com.team.leaf.user.account.exception.ApiResponse;
 import com.team.leaf.user.account.exception.ApiResponseStatus;
@@ -16,9 +17,9 @@ public class ProductController {
     private final ProductService productService;
 
     @GetMapping("/product")
-    public ApiResponse getAllProduct(Pageable pageable) {
+    public ApiResponse getAllProduct(Pageable pageable, ProductRequest request) {
 
-        return new ApiResponse(productService.getAllProduct(pageable));
+        return new ApiResponse(productService.getAllProduct(pageable, request));
     }
 
     @PostMapping("/product/{productId}/wish-list")
