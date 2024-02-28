@@ -29,4 +29,10 @@ public class ProductController {
         return new ApiResponse(ApiResponseStatus.SUCCESS);
     }
 
+    @GetMapping("/product/{search}")
+    public ApiResponse getAllProductBySearch(Pageable pageable, ProductRequest request, @PathVariable String search) {
+
+        return new ApiResponse(productService.getAllProductBySearch(pageable, request, search));
+    }
+
 }

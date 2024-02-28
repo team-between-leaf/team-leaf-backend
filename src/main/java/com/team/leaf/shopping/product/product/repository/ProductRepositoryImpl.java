@@ -1,6 +1,5 @@
 package com.team.leaf.shopping.product.product.repository;
 
-import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.team.leaf.shopping.product.product.dto.ProductRequest;
@@ -8,11 +7,10 @@ import com.team.leaf.shopping.product.product.dto.ProductResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 
-import static com.querydsl.jpa.JPAExpressions.select;
-import static com.team.leaf.shopping.product.review.entity.QReview.review;
-import static com.team.leaf.shopping.product.product.entity.QProduct.product;
-
 import java.util.List;
+
+import static com.team.leaf.shopping.product.product.entity.QProduct.product;
+import static com.team.leaf.shopping.product.review.entity.QReview.review;
 
 @RequiredArgsConstructor
 public class ProductRepositoryImpl implements CustomProductRepository {
@@ -35,6 +33,28 @@ public class ProductRepositoryImpl implements CustomProductRepository {
                 .from(product)
                 .groupBy(product.reviews, review)
                 .orderBy(request.getSortType().getSort())
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .fetch();
+    }
+
+    @Override
+    public List<ProductResponse> getAllProductBySearch(Pageable pageable, ProductRequest request, String search) {
+        return jpaQueryFactory.select(Projections.constructor(ProductResponse.class,
+                        product.productId,
+                        product.title,
+                        product.description,
+                        product.price,
+                        product.image,
+                        product.registrationDate,
+                        product.views,
+                        product.discountRate,
+                        review.score.avg()
+                ))
+                .from(product)
+                .groupBy(product.reviews, review)
+                .orderBy(request.getSortType().getSort())
+                .where(product.title.eq(search))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetch();

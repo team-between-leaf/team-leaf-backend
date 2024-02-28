@@ -10,4 +10,6 @@ public interface CustomProductRepository {
 
     List<ProductResponse> getAllProduct(Pageable pageable, ProductRequest request);
 
+    List<ProductResponse> getAllProductBySearch(Pageable pageable, ProductRequest request, String search);
+
 }
