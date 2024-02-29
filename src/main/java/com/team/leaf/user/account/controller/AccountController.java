@@ -5,6 +5,7 @@ import com.team.leaf.user.account.dto.request.LoginRequest;
 import com.team.leaf.user.account.dto.response.AccountDto;
 import com.team.leaf.user.account.dto.response.GlobalResDto;
 import com.team.leaf.user.account.dto.response.LoginAccountDto;
+import com.team.leaf.user.account.dto.response.TokenDto;
 import com.team.leaf.user.account.exception.ApiResponse;
 import com.team.leaf.user.account.jwt.JwtTokenUtil;
 import com.team.leaf.user.account.jwt.PrincipalDetails;
@@ -13,6 +14,7 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -49,11 +51,19 @@ public class AccountController {
         return new ApiResponse<>(accountService.logout(userEmail));
     }
 
-    @GetMapping("/issue/token")
-    @SecurityRequirement(name = "JWT")
-    public GlobalResDto issuedToken(@AuthenticationPrincipal PrincipalDetails userDetails, @RequestHeader(value = "Authorization") String authorizationHeader, HttpServletResponse response) {
-        response.addHeader(JwtTokenUtil.ACCESS_TOKEN, jwtTokenUtil.createToken(userDetails.getAccountDetail().getEmail(), "Access"));
-        return new GlobalResDto("Success IssuedToken", HttpStatus.OK.value());
+    @PostMapping("/issue/token")
+    public ResponseEntity<?> refreshAccessToken(@RequestHeader(name = JwtTokenUtil.REFRESH_TOKEN, required = false) String refreshToken) {
+        try {
+            TokenDto newTokenDto = accountService.refreshAccessToken(refreshToken);
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.add(JwtTokenUtil.ACCESS_TOKEN, newTokenDto.getAccessToken());
+            headers.add(JwtTokenUtil.REFRESH_TOKEN, newTokenDto.getRefreshToken());
+
+            return new ResponseEntity<>(headers, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>("Failed to refresh access token", HttpStatus.UNAUTHORIZED);
+        }
     }
 
     @GetMapping("/{userEmail}")
