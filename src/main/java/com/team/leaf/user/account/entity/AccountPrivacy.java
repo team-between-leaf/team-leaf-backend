@@ -17,8 +17,30 @@ public class AccountPrivacy {
 
     private String Image;
 
-    private boolean isReceiveMarketing;
+    private boolean isOrderDeliveryNotify;
+
+    private boolean isFollowedSellerNotify;
+
+    private boolean isMarketingNotify;
+
+    private boolean isWishlistNotify;
 
     private LocalDate birthDate;
+
+    public void updateOrderDeliveryNotify(boolean bool) {
+        isOrderDeliveryNotify = bool;
+    }
+
+    public void updateFollowedSellerNotify(boolean bool) {
+        isFollowedSellerNotify = bool;
+    }
+
+    public void updateMarketingNotify(boolean bool) {
+        isMarketingNotify = bool;
+    }
+
+    public void updateWishlistNotify(boolean bool) {
+        isWishlistNotify = bool;
+    }
 
 }
