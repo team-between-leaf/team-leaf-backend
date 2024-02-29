@@ -30,6 +30,9 @@ public class AccountPrivacy {
 
     private LocalDate birthDate;
 
+    @OneToOne(mappedBy = "userDetail", fetch = FetchType.LAZY)
+    private AccountDetail accountDetail;
+
     public void updateOrderDeliveryNotify(boolean bool) {
         isOrderDeliveryNotify = bool;
     }

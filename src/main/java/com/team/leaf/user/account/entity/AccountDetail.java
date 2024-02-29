@@ -52,7 +52,7 @@ public class AccountDetail {
     @Column(nullable = false)
     private AccountRole role;
 
-    @OneToOne(cascade = {CascadeType.PERSIST, CascadeType.REMOVE}, orphanRemoval = true)
+    @OneToOne(cascade = {CascadeType.PERSIST, CascadeType.REMOVE}, orphanRemoval = true, fetch = FetchType.LAZY)
     private AccountPrivacy userDetail;
 
     @OneToMany(cascade = CascadeType.PERSIST, orphanRemoval = true)

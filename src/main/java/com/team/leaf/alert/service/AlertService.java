@@ -60,8 +60,8 @@ public class AlertService {
 
     public SseEmitter subscribeAlert(String token) {
         SseEmitter emitter = new SseEmitter(DEFAULT_TIMEOUT);
-        String email = jwtTokenUtil.getEmailFromToken(token);
 
+        String email = jwtTokenUtil.getEmailFromToken(token);
         AccountDetail account = accountRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("not fount User"));
 

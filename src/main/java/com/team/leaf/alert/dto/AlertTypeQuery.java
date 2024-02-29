@@ -10,7 +10,7 @@ import static com.team.leaf.user.account.entity.QAccountPrivacy.accountPrivacy;
 @RequiredArgsConstructor
 public enum AlertTypeQuery {
 
-    ORDER_DELIVERY(accountPrivacy.isFollowedSellerNotify.eq(true)),
+    ORDER_DELIVERY(accountPrivacy.isOrderDeliveryNotify.eq(true)),
     FOLLOWED_SELLER(accountPrivacy.isFollowedSellerNotify.eq(true)),
     MARKETING(accountPrivacy.isMarketingNotify.eq(true)),
     WISHLIST(accountPrivacy.isWishlistNotify.eq(true));
