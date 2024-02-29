@@ -24,6 +24,7 @@ public class AccountDetail {
 
     private String name;
 
+    @Column(unique = true)
     private String nickname;
 
     private String birthday;
