@@ -47,7 +47,6 @@ public class WishService {
         Wish wish = Wish.builder()
                 .user(AccountDetail.builder().userId(wishAddRequest.getUserId()).build())
                 .product(Product.builder().productId(wishAddRequest.getProductId()).build())
-                .amount(wishAddRequest.getAmount())
                 .build();
         try {
             wishRepository.save(wish);

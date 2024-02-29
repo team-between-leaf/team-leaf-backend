@@ -33,9 +33,11 @@ public class Product {
 
     private long views;
 
+    private long saleRate;
+
     private double discountRate;
 
-    @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.REMOVE}, orphanRemoval = true)
+    @OneToMany(mappedBy = "product", cascade = {CascadeType.PERSIST, CascadeType.REMOVE}, orphanRemoval = true)
     private List<Review> reviews;
 
 }

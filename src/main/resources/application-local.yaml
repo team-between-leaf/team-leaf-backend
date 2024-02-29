@@ -19,14 +19,14 @@ spring:
     database-platform: org.hibernate.dialect.MySQLDialect
     show-sql: true
     hibernate:
-      ddl-auto: validate
+      ddl-auto: create-drop
     properties:
       hibernate:
         show_sql: true
         format_sql: true
 
 jwt:
-  secret: 
+  secret: 4h2h24h2424h4g45yh436juh536j45hj246h4thtgdfh564h35g35hdrt6jr6j
 
 springdoc:
   default-consumes-media-type: application/json

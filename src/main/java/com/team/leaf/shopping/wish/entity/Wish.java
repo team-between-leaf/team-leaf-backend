@@ -11,8 +11,8 @@ import lombok.NoArgsConstructor;
 @Entity
 @Getter
 @Builder
-@NoArgsConstructor
 @AllArgsConstructor
+@NoArgsConstructor
 public class Wish {
 
     @Id
@@ -25,6 +25,11 @@ public class Wish {
     @ManyToOne(fetch = FetchType.LAZY)
     private Product product;
 
-    private int amount;
+    public static Wish createWish(AccountDetail accountDetail, Product product) {
+        return Wish.builder()
+                .user(accountDetail)
+                .product(product)
+                .build();
+    }
 
 }
