@@ -34,10 +34,13 @@ public class AlertService {
     private Map<Long , SseEmitter> session = new HashMap<>();
 
     @Transactional
-    public void updateAlertNotify(AccountDetail accountDetail, AlertRequest request) {
-        AccountPrivacy accountPrivacy = accountDetail.getUserDetail();
+    public void updateAlertNotify(String token, AlertRequest request) {
+        String email = jwtTokenUtil.getEmailFromToken(token);
 
-        updateNotifyData(accountPrivacy, request);
+        AccountDetail account = accountRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("not fount User"));
+
+        updateNotifyData(account.getUserDetail(), request);
     }
 
     private void updateNotifyData(AccountPrivacy account, AlertRequest request) {

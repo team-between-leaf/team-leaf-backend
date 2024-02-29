@@ -32,8 +32,8 @@ public class AlertController {
     }
 
     @PutMapping("/alert/notify")
-    public ApiResponse updateAlertNotify(@AuthenticationPrincipal PrincipalDetails userDetails , @RequestBody AlertRequest request) {
-        alertService.updateAlertNotify(userDetails.getAccountDetail(), request);
+    public ApiResponse updateAlertNotify(@RequestHeader(value = "Authorization") String authorizationHeader , @RequestBody AlertRequest request) {
+        alertService.updateAlertNotify(authorizationHeader, request);
 
         return new ApiResponse(ApiResponseStatus.SUCCESS);
     }
