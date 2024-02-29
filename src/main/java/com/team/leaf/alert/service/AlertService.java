@@ -8,7 +8,9 @@ import com.team.leaf.alert.entity.Alert;
 import com.team.leaf.alert.repository.AlertRepository;
 import com.team.leaf.user.account.entity.AccountDetail;
 import com.team.leaf.user.account.entity.AccountPrivacy;
+import com.team.leaf.user.account.jwt.JwtTokenUtil;
 import com.team.leaf.user.account.jwt.PrincipalDetails;
+import com.team.leaf.user.account.repository.AccountRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -26,6 +28,8 @@ import static com.team.leaf.alert.dto.AlertType.*;
 public class AlertService {
 
     private final AlertRepository alertRepository;
+    private final JwtTokenUtil jwtTokenUtil;
+    private final AccountRepository accountRepository;
     private static final Long DEFAULT_TIMEOUT = 60L * 1000 * 60; // 60 second
     private Map<Long , SseEmitter> session = new HashMap<>();
 
@@ -51,9 +55,14 @@ public class AlertService {
         }
     }
 
-    public SseEmitter subscribeAlert(PrincipalDetails userDetails) {
+    public SseEmitter subscribeAlert(String token) {
         SseEmitter emitter = new SseEmitter(DEFAULT_TIMEOUT);
-        long id = userDetails.getAccountDetail().getUserId();
+        String email = jwtTokenUtil.getEmailFromToken(token);
+
+        AccountDetail account = accountRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("not fount User"));
+
+        long id = account.getUserId();
 
         if(session.containsKey(id)) {
             session.remove(id);

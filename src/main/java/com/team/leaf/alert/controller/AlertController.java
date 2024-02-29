@@ -18,8 +18,8 @@ public class AlertController {
     private final AlertService alertService;
 
     @GetMapping(value = "/alert/subscribe" , produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-    public ApiResponse subscribeAlert(@AuthenticationPrincipal PrincipalDetails userDetails) {
-        alertService.subscribeAlert(userDetails);
+    public ApiResponse subscribeAlert(@RequestHeader(value = "Authorization") String authorizationHeader) {
+        alertService.subscribeAlert(authorizationHeader);
 
         return new ApiResponse(ApiResponseStatus.SUCCESS);
     }

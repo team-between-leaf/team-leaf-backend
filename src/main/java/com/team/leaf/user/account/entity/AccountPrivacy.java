@@ -1,12 +1,15 @@
 package com.team.leaf.user.account.entity;
 
 import jakarta.persistence.*;
-import lombok.Getter;
+import lombok.*;
 
 import java.time.LocalDate;
 
 @Entity
 @Getter
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class AccountPrivacy {
 
     @Id
@@ -41,6 +44,16 @@ public class AccountPrivacy {
 
     public void updateWishlistNotify(boolean bool) {
         isWishlistNotify = bool;
+    }
+
+    public static AccountPrivacy createAccountPrivacy() {
+        return AccountPrivacy.builder()
+                .isStudent(false)
+                .isFollowedSellerNotify(false)
+                .isMarketingNotify(false)
+                .isOrderDeliveryNotify(false)
+                .isWishlistNotify(false)
+                .build();
     }
 
 }

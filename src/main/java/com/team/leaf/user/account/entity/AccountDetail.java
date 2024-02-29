@@ -7,6 +7,8 @@ import lombok.*;
 import java.time.LocalDate;
 import java.util.List;
 
+import static com.team.leaf.user.account.entity.AccountPrivacy.createAccountPrivacy;
+
 @Entity
 @Getter
 @Builder
@@ -64,6 +66,7 @@ public class AccountDetail {
         accountDetail.nickname = nickname;
         accountDetail.role = AccountRole.USER;
         accountDetail.joinDate = LocalDate.now();
+        accountDetail.userDetail = createAccountPrivacy();
         //accountDetail.lastAccess = LocalDate.now();
 
         return accountDetail;
