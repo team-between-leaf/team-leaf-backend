@@ -39,20 +39,31 @@ public class DataLoader implements CommandLineRunner {
         Product product10 = Product.builder().title("꽃병").description("꽃병이다. 꽃을 넣을 수 있는 병이다. 그렇다고").price(5000).discountRate(6.2).image("https://ibb.co/zRZj4bF").saleRate(10).views(0).registrationDate(LocalDateTime.of(2018, 3, 6, 12, 30, 00)).build();
 
         // Account
-        AccountDetail accountDetail = accountRepository.findByEmail("hchaehyun@naver.com")
+        AccountDetail accountDetail1 = accountRepository.findByEmail("hchaehyun@naver.com")
                 .orElseGet(() -> accountRepository.save(AccountDetail.joinAccount(
                         "hchaehyun@naver.com",
                         jwtSecurityConfig.passwordEncoder().encode("password"),
                         "01012341234",
                         "hchaehyun@naver.com")));
 
+        AccountDetail accountDetail2 = accountRepository.findByEmail("admin@admin.com ")
+                .orElseGet(() -> accountRepository.save(AccountDetail.joinAccount(
+                        "admin@admin.com",
+                        jwtSecurityConfig.passwordEncoder().encode("@Ll12345"),
+                        "01012341234",
+                        "admin@admin.com")));
+
         // WishList
-        Wish wish1 = Wish.builder().product(product1).user(accountDetail).build();
-        Wish wish2 = Wish.builder().product(product2).user(accountDetail).build();
-        Wish wish3 = Wish.builder().product(product6).user(accountDetail).build();
-        Wish wish4 = Wish.builder().product(product10).user(accountDetail).build();
+        Wish wish1 = Wish.builder().product(product1).user(accountDetail1).build();
+        Wish wish2 = Wish.builder().product(product2).user(accountDetail1).build();
+        Wish wish3 = Wish.builder().product(product6).user(accountDetail1).build();
+        Wish wish4 = Wish.builder().product(product10).user(accountDetail1).build();
+        Wish wish5 = Wish.builder().product(product1).user(accountDetail2).build();
+        Wish wish6 = Wish.builder().product(product2).user(accountDetail2).build();
+        Wish wish7 = Wish.builder().product(product6).user(accountDetail2).build();
+        Wish wish8 = Wish.builder().product(product10).user(accountDetail2).build();
 
         productRepository.saveAll(Arrays.asList(product1, product2, product3, product4, product5, product6, product7, product8, product9, product10));
-        wishRepository.saveAll(Arrays.asList(wish1, wish2, wish3, wish4));
+        wishRepository.saveAll(Arrays.asList(wish1, wish2, wish3, wish4, wish5, wish6, wish7, wish8));
     }
 }
