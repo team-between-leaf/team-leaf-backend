@@ -21,20 +21,7 @@ public class BoardService {
 
     private final AccountRepository accountRepository;
     public List<BoardResponse> boardPage(){
-        List<Board> boards = boardRepository.findAll();
-        List<BoardResponse> boardResponses = new ArrayList<>();
-        for(Board board : boards){
-            BoardResponse boardResponse = BoardResponse.builder()
-                    .boardId(board.getBoardId())
-                    .price(board.getPrice())
-                    .content(board.getContent())
-                    .title(board.getTitle())
-                    .writeDate(board.getWriteDate())
-                    .nickname(board.getWriter().getNickname())
-                    .build();
-            boardResponses.add(boardResponse);
-        }
-        return boardResponses;
+        return boardRepository.getAllBoard();
     }
 
     @Transactional

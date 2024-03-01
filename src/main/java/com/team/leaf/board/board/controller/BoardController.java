@@ -15,7 +15,6 @@ import java.util.List;
 public class BoardController {
 
     private final BoardService boardService;
-    private final JwtTokenUtil jwtTokenUtil;
 
     @GetMapping("/board")
     public ResponseEntity<List<BoardResponse>> boardPage(){
