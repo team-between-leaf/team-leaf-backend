@@ -3,6 +3,8 @@ package com.team.leaf.alert.controller;
 import com.team.leaf.alert.dto.AlertRequest;
 import com.team.leaf.alert.dto.SendAlertRequest;
 import com.team.leaf.alert.service.AlertService;
+import com.team.leaf.common.custom.LogIn;
+import com.team.leaf.user.account.entity.AccountDetail;
 import com.team.leaf.user.account.exception.ApiResponse;
 import com.team.leaf.user.account.exception.ApiResponseStatus;
 import io.swagger.v3.oas.annotations.Operation;
@@ -18,8 +20,8 @@ public class AlertController {
 
     @GetMapping(value = "/alert/subscribe" , produces = "text/event-stream")
     @Operation(summary = "SSE 연결을 위한 요청입니다.")
-    public SseEmitter subscribeAlert(@RequestHeader(value = "Authorization") String authorizationHeader) {
-        return alertService.subscribeAlert(authorizationHeader);
+    public SseEmitter subscribeAlert(@LogIn AccountDetail accountDetail) {
+        return alertService.subscribeAlert(accountDetail);
     }
 
     @PostMapping("/alert/message")
@@ -32,8 +34,8 @@ public class AlertController {
 
     @PutMapping("/alert/notify")
     @Operation(summary = "SSE 알림 설정 API")
-    public ApiResponse updateAlertNotify(@RequestHeader(value = "Authorization") String authorizationHeader , @RequestBody AlertRequest request) {
-        alertService.updateAlertNotify(authorizationHeader, request);
+    public ApiResponse updateAlertNotify(@LogIn AccountDetail accountDetail, @RequestBody AlertRequest request) {
+        alertService.updateAlertNotify(accountDetail, request);
 
         return new ApiResponse(ApiResponseStatus.SUCCESS);
     }

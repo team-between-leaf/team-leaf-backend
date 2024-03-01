@@ -6,6 +6,7 @@ import com.team.leaf.alert.dto.AlertTypeQuery;
 import com.team.leaf.alert.dto.SendAlertRequest;
 import com.team.leaf.alert.entity.Alert;
 import com.team.leaf.alert.repository.AlertRepository;
+import com.team.leaf.common.custom.LogIn;
 import com.team.leaf.user.account.entity.AccountDetail;
 import com.team.leaf.user.account.entity.AccountPrivacy;
 import com.team.leaf.user.account.jwt.JwtTokenUtil;
@@ -34,13 +35,8 @@ public class AlertService {
     private Map<Long , SseEmitter> session = new HashMap<>();
 
     @Transactional
-    public void updateAlertNotify(String token, AlertRequest request) {
-        String email = jwtTokenUtil.getEmailFromToken(token);
-
-        AccountDetail account = accountRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("not fount User"));
-
-        updateNotifyData(account.getUserDetail(), request);
+    public void updateAlertNotify(AccountDetail accountDetail, AlertRequest request) {
+        updateNotifyData(accountDetail.getUserDetail(), request);
     }
 
     private void updateNotifyData(AccountPrivacy account, AlertRequest request) {
@@ -58,14 +54,9 @@ public class AlertService {
         }
     }
 
-    public SseEmitter subscribeAlert(String token) {
+    public SseEmitter subscribeAlert(AccountDetail accountDetail) {
         SseEmitter emitter = new SseEmitter(DEFAULT_TIMEOUT);
-
-        String email = jwtTokenUtil.getEmailFromToken(token);
-        AccountDetail account = accountRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("not fount User"));
-
-        long id = account.getUserId();
+        long id = accountDetail.getUserId();
 
         if(session.containsKey(id)) {
             session.remove(id);
