@@ -7,6 +7,8 @@ import lombok.*;
 import java.time.LocalDate;
 import java.util.List;
 
+import static com.team.leaf.user.account.entity.AccountPrivacy.createAccountPrivacy;
+
 @Entity
 @Data
 @Builder
@@ -50,7 +52,7 @@ public class AccountDetail {
     @Column(nullable = false)
     private AccountRole role;
 
-    @OneToOne(cascade = {CascadeType.PERSIST, CascadeType.REMOVE}, orphanRemoval = true)
+    @OneToOne(cascade = {CascadeType.PERSIST, CascadeType.REMOVE}, orphanRemoval = true, fetch = FetchType.LAZY)
     private AccountPrivacy userDetail;
 
     @OneToMany(cascade = CascadeType.PERSIST, orphanRemoval = true)
@@ -64,6 +66,7 @@ public class AccountDetail {
         accountDetail.nickname = nickname;
         accountDetail.role = AccountRole.USER;
         accountDetail.joinDate = LocalDate.now();
+        accountDetail.userDetail = createAccountPrivacy();
         //accountDetail.lastAccess = LocalDate.now();
 
         return accountDetail;

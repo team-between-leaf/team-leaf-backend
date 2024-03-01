@@ -26,8 +26,8 @@ public class ProductController {
 
     @PostMapping("/product/{productId}/wish-list")
     @Operation(summary = "위시 리스트 추가")
-    public ApiResponse addWishList(@AuthenticationPrincipal PrincipalDetails userDetails, @PathVariable long productId) {
-        productService.addWishList(userDetails , productId);
+    public ApiResponse addWishList(@RequestHeader(value = "Authorization") String authorizationHeader, @PathVariable long productId) {
+        productService.addWishList(authorizationHeader , productId);
 
         return new ApiResponse(ApiResponseStatus.SUCCESS);
     }

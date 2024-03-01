@@ -6,8 +6,8 @@ import com.team.leaf.shopping.product.product.entity.Product;
 import com.team.leaf.shopping.product.product.repository.ProductRepository;
 import com.team.leaf.shopping.wish.entity.Wish;
 import com.team.leaf.shopping.wish.repository.WishRepository;
-import com.team.leaf.user.account.exception.ApiResponseStatus;
-import com.team.leaf.user.account.jwt.PrincipalDetails;
+import com.team.leaf.user.account.entity.AccountDetail;
+import com.team.leaf.user.account.jwt.JwtTokenUtil;
 import com.team.leaf.user.account.repository.AccountRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -21,17 +21,23 @@ public class ProductService {
 
     private final ProductRepository productRepository;
     private final WishRepository wishRepository;
+    private final JwtTokenUtil jwtTokenUtil;
+    private final AccountRepository accountRepository;
 
     public List<ProductResponse> getAllProduct(Pageable pageable, ProductRequest request) {
 
         return productRepository.getAllProduct(pageable, request);
     }
 
-    public void addWishList(PrincipalDetails detail,long productId) {
+    public void addWishList(String token,long productId) {
+        String email = jwtTokenUtil.getEmailFromToken(token);
+        AccountDetail account = accountRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("not fount User"));
+
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new RuntimeException("Not fount product"));
 
-        wishRepository.save(Wish.createWish(detail.getAccountDetail(), product));
+        wishRepository.save(Wish.createWish(account , product));
     }
 
     public List<ProductResponse> getAllProductBySearch(Pageable pageable, ProductRequest request, String search) {
