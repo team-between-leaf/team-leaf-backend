@@ -29,8 +29,6 @@ import static com.team.leaf.alert.dto.AlertType.*;
 public class AlertService {
 
     private final AlertRepository alertRepository;
-    private final JwtTokenUtil jwtTokenUtil;
-    private final AccountRepository accountRepository;
     private static final Long DEFAULT_TIMEOUT = 60L * 1000 * 60; // 60 second
     private Map<Long , SseEmitter> session = new HashMap<>();
 
