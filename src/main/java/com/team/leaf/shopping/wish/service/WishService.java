@@ -1,7 +1,6 @@
 package com.team.leaf.shopping.wish.service;
 
 import com.team.leaf.shopping.product.product.entity.Product;
-import com.team.leaf.shopping.wish.dto.WishAddRequest;
 import com.team.leaf.shopping.wish.dto.WishRequest;
 import com.team.leaf.shopping.wish.dto.WishResponse;
 import com.team.leaf.shopping.wish.entity.Wish;
@@ -38,15 +37,15 @@ public class WishService {
     }
 
     @Transactional
-    public Boolean addWish(WishAddRequest wishAddRequest){
+    public Boolean addWish(WishRequest wishRequest){
 
-        if (wishRepository.existsByUserUserIdAndProductProductId(wishAddRequest.getUserId(), wishAddRequest.getProductId())) {
+        if (wishRepository.existsByUserUserIdAndProductProductId(wishRequest.getUserId(), wishRequest.getProductId())) {
             return false;
         }
 
         Wish wish = Wish.builder()
-                .user(AccountDetail.builder().userId(wishAddRequest.getUserId()).build())
-                .product(Product.builder().productId(wishAddRequest.getProductId()).build())
+                .user(AccountDetail.builder().userId(wishRequest.getUserId()).build())
+                .product(Product.builder().productId(wishRequest.getProductId()).build())
                 .build();
         try {
             wishRepository.save(wish);
