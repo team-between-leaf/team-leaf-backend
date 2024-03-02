@@ -1,6 +1,5 @@
 package com.team.leaf.shopping.wish.controller;
 
-import com.team.leaf.shopping.wish.dto.WishAddRequest;
 import com.team.leaf.shopping.wish.dto.WishRequest;
 import com.team.leaf.shopping.wish.dto.WishResponse;
 import com.team.leaf.shopping.wish.service.WishService;
@@ -21,8 +20,8 @@ public class WishController {
     }
 
     @PostMapping("/product/wish")
-    public ResponseEntity<Boolean> addWish(@RequestBody WishAddRequest wishAddRequest){
-        return ResponseEntity.ok(wishService.addWish(wishAddRequest));
+    public ResponseEntity<Boolean> addWish(@RequestBody WishRequest wishRequest){
+        return ResponseEntity.ok(wishService.addWish(wishRequest));
     }
 
     @DeleteMapping("/product/wish")
