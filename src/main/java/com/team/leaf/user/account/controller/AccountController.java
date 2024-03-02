@@ -37,8 +37,8 @@ public class AccountController {
     }
 
     @GetMapping(value = "/join/{phone}")
-    public ResponseEntity phoneCheck(@PathVariable String phone) {
-        return ResponseEntity.ok(accountService.findAccountByPhone(phone));
+    public ResponseEntity<Boolean> phoneCheck(@PathVariable String phone) {
+        return ResponseEntity.ok(accountService.checkPhoneDuplicate(phone));
     }
 
     @PostMapping("/login")
