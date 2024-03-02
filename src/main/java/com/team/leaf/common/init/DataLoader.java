@@ -50,7 +50,7 @@ public class DataLoader implements CommandLineRunner {
                 .orElseGet(() -> accountRepository.save(AccountDetail.joinAccount(
                         "admin@admin.com",
                         jwtSecurityConfig.passwordEncoder().encode("@Ll12345"),
-                        "01012341234",
+                        "01043214321",
                         "admin@admin.com")));
 
         // WishList
