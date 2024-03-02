@@ -17,8 +17,8 @@ import java.util.List;
 @RequiredArgsConstructor
 public class WishService {
     private final WishRepository wishRepository;
-    public List<WishResponse> findWishById(Long userId){
-        List<Wish> wishes = wishRepository.findAllByUserUserId(userId);
+    public List<WishResponse> findWishById(AccountDetail accountDetail){
+        List<Wish> wishes = wishRepository.findAllByUserUserId(accountDetail.getUserId());
         List<WishResponse> wishResponses = new ArrayList<>();
             for(Wish wish : wishes){
                 Product product = wish.getProduct();

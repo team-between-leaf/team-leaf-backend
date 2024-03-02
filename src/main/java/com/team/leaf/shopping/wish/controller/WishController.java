@@ -1,8 +1,10 @@
 package com.team.leaf.shopping.wish.controller;
 
+import com.team.leaf.common.custom.LogIn;
 import com.team.leaf.shopping.wish.dto.WishRequest;
 import com.team.leaf.shopping.wish.dto.WishResponse;
 import com.team.leaf.shopping.wish.service.WishService;
+import com.team.leaf.user.account.entity.AccountDetail;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -14,9 +16,9 @@ import java.util.List;
 public class WishController {
     private final WishService wishService;
 
-    @GetMapping("/product/wish/{userId}")
-    public ResponseEntity<List<WishResponse>> wishPage(@PathVariable(name="userId") Long userId){
-        return ResponseEntity.ok(wishService.findWishById(userId));
+    @GetMapping("/product/wish")
+    public ResponseEntity<List<WishResponse>> wishPage(@LogIn AccountDetail accountDetail){
+        return ResponseEntity.ok(wishService.findWishById(accountDetail));
     }
 
     @PostMapping("/product/wish")
