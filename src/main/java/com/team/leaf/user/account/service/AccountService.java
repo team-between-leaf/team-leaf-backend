@@ -36,6 +36,13 @@ public class AccountService {
         return accountRepository.existsByPhone(phone);
     }
 
+    public AccountDto findAccountByPhone(String phone) {
+        AccountDetail accountDetail = accountRepository.findAccountByPhone(phone)
+                .orElseThrow(() -> new RuntimeException("not exist phone number"));
+
+        return new AccountDto(accountDetail);
+    }
+
     private void validateEmail(String email) {
         String emailRegex = "^[a-zA-Z0-9_+&*-]+(?:\\.[a-zA-Z0-9_+&*-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,7}$";
         Pattern emailPattern = Pattern.compile(emailRegex);

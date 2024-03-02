@@ -14,4 +14,9 @@ public class GeneralExceptionHandler {
         return ResponseEntity.badRequest().body(MessageResponse.createResponse(e.getMessage()));
     }
 
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity handleException(Exception e) {
+        return ResponseEntity.badRequest().body(MessageResponse.createResponse(e.getMessage()));
+    }
+
 }
