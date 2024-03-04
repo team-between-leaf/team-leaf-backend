@@ -2,6 +2,7 @@ package com.team.leaf.shopping.product.product.entity;
 
 import com.team.leaf.shopping.product.category.entity.CategoryProduct;
 import com.team.leaf.shopping.product.review.entity.Review;
+import com.team.leaf.user.account.entity.AccountDetail;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -44,13 +45,16 @@ public class Product {
 
     private LocalDate productionTime;
 
-    @Builder.Default
-    @OneToMany(mappedBy = "product", cascade = {CascadeType.PERSIST, CascadeType.REMOVE}, orphanRemoval = true)
-    private List<Review> reviews = new LinkedList<>();;
+    @ManyToOne(fetch = FetchType.LAZY)
+    private AccountDetail seller;
 
     @Builder.Default
     @OneToMany(mappedBy = "product", cascade = {CascadeType.PERSIST, CascadeType.REMOVE}, orphanRemoval = true)
-    private List<CategoryProduct> categories = new LinkedList<>();;
+    private List<Review> reviews = new LinkedList<>();
+
+    @Builder.Default
+    @OneToMany(mappedBy = "product", cascade = {CascadeType.PERSIST, CascadeType.REMOVE}, orphanRemoval = true)
+    private List<CategoryProduct> categories = new LinkedList<>();
 
     @Builder.Default
     @OneToMany(mappedBy = "product", cascade = {CascadeType.PERSIST, CascadeType.REMOVE}, orphanRemoval = true)

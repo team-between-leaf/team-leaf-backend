@@ -6,8 +6,6 @@ import lombok.ToString;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 
 @ToString
@@ -39,9 +37,15 @@ public class ProductDetailResponse {
     @JsonFormat(shape = JsonFormat.Shape.STRING , pattern = "yyyy-MM-dd" , timezone = "Asia/Seoul")
     private LocalDate productionTime;
 
+    private long sellerId;
+
+    private String sellerImage;
+
+    private String sellerNickname;
+
     private List<OptionResponse> options;
 
-    public ProductDetailResponse(long productId, String title, String description, int price, String image, LocalDateTime registrationDate, long saleRate, long views, double discountRate, LocalDate deliveryStart, LocalDate productionTime) {
+    public ProductDetailResponse(long productId, String title, String description, int price, String image, LocalDateTime registrationDate, long saleRate, long views, double discountRate, LocalDate deliveryStart, LocalDate productionTime, long sellerId, String sellerImage, String sellerNickname) {
         this.productId = productId;
         this.title = title;
         this.description = description;
@@ -53,6 +57,9 @@ public class ProductDetailResponse {
         this.discountRate = discountRate;
         this.deliveryStart = deliveryStart;
         this.productionTime = productionTime;
+        this.sellerId = sellerId;
+        this.sellerImage = sellerImage;
+        this.sellerNickname = sellerNickname;
     }
 
     public void setOption(List<OptionResponse> optionList) {

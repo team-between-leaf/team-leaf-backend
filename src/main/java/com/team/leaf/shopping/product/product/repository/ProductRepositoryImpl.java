@@ -1,11 +1,6 @@
 package com.team.leaf.shopping.product.product.repository;
 
-import com.querydsl.core.Tuple;
-import com.querydsl.core.types.Expression;
-import com.querydsl.core.types.ExpressionUtils;
 import com.querydsl.core.types.Projections;
-import com.querydsl.core.types.dsl.CaseBuilder;
-import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.team.leaf.shopping.product.product.dto.OptionResponse;
 import com.team.leaf.shopping.product.product.dto.ProductDetailResponse;
@@ -14,15 +9,14 @@ import com.team.leaf.shopping.product.product.dto.ProductResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
-import static com.team.leaf.shopping.product.product.entity.QProductOption.productOption;
 import static com.team.leaf.shopping.product.product.entity.QProduct.product;
+import static com.team.leaf.shopping.product.product.entity.QProductOption.productOption;
 import static com.team.leaf.shopping.product.review.entity.QReview.review;
+import static com.team.leaf.user.account.entity.QAccountDetail.accountDetail;
+import static com.team.leaf.user.account.entity.QAccountPrivacy.accountPrivacy;
 
 @RequiredArgsConstructor
 public class ProductRepositoryImpl implements CustomProductRepository {
@@ -89,19 +83,24 @@ public class ProductRepositoryImpl implements CustomProductRepository {
                         product.views,
                         product.discountRate,
                         product.deliveryStart,
-                        product.productionTime
+                        product.productionTime,
+                        accountDetail.userId,
+                        accountDetail.nickname,
+                        accountPrivacy.Image
                 ))
                 .from(product)
+                .innerJoin(product.seller, accountDetail)
+                .innerJoin(accountDetail.userDetail, accountPrivacy)
                 .groupBy(product.productId)
                 .where(product.productId.eq(productId))
                 .fetchOne();
 
         List<OptionResponse> optionList = jpaQueryFactory.select(
-                Projections.constructor(
-                        OptionResponse.class,
-                        productOption.keyData,
-                        productOption.valueData
-                ))
+                        Projections.constructor(
+                                OptionResponse.class,
+                                productOption.keyData,
+                                productOption.valueData
+                        ))
                 .from(productOption)
                 .innerJoin(productOption.product).on(product.productId.eq(productId))
                 .fetch();

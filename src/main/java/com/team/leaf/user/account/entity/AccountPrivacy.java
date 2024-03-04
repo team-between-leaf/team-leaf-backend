@@ -59,4 +59,8 @@ public class AccountPrivacy {
                 .build();
     }
 
+    public void updateProfileImage(String url) {
+        this.Image = url;
+    }
+
 }
