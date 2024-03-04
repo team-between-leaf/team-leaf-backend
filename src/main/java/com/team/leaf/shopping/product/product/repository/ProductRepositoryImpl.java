@@ -6,6 +6,8 @@ import com.team.leaf.shopping.product.product.dto.OptionResponse;
 import com.team.leaf.shopping.product.product.dto.ProductDetailResponse;
 import com.team.leaf.shopping.product.product.dto.ProductRequest;
 import com.team.leaf.shopping.product.product.dto.ProductResponse;
+import com.team.leaf.shopping.product.product.entity.Product;
+import com.team.leaf.user.account.entity.AccountDetail;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 
@@ -107,6 +109,17 @@ public class ProductRepositoryImpl implements CustomProductRepository {
 
 
         result.setOption(optionList);
+
+        return Optional.ofNullable(result);
+    }
+
+    @Override
+    public Optional<Product> findProductByProductIdAndSeller(long productId, AccountDetail account) {
+        Product result = jpaQueryFactory.select(product)
+                .from(product)
+                .innerJoin(product.seller, accountDetail).on(accountDetail.eq(account))
+                .where(product.productId.eq(productId))
+                .fetchOne();
 
         return Optional.ofNullable(result);
     }

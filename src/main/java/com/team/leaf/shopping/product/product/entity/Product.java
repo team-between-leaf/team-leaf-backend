@@ -1,5 +1,6 @@
 package com.team.leaf.shopping.product.product.entity;
 
+import com.team.leaf.shopping.coupon.entity.Coupon;
 import com.team.leaf.shopping.product.category.entity.CategoryProduct;
 import com.team.leaf.shopping.product.review.entity.Review;
 import com.team.leaf.user.account.entity.AccountDetail;
@@ -60,9 +61,18 @@ public class Product {
     @OneToMany(mappedBy = "product", cascade = {CascadeType.PERSIST, CascadeType.REMOVE}, orphanRemoval = true)
     private List<ProductOption> productOptions = new LinkedList<>();
 
+    @Builder.Default
+    @OneToMany(mappedBy = "product", cascade = {CascadeType.PERSIST, CascadeType.REMOVE}, orphanRemoval = true)
+    private List<Coupon> coupons = new LinkedList<>();
+
     public void addProductOption(ProductOption option) {
         productOptions.add(option);
         option.setProduct(this);
+    }
+
+    public void addCoupon(Coupon coupon) {
+        coupons.add(coupon);
+        coupon.setProduct(this);
     }
 
     public void addReview(Review review) {
