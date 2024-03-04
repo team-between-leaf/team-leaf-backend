@@ -21,7 +21,9 @@ public class CartService {
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new RuntimeException("not found Product Data"));
 
-        Cart cart = Cart.createCart(product, accountDetail);
-        cartRepository.save(cart);
+        Cart cart = cartRepository.findCartByUserAndProduct(accountDetail, product)
+                .orElseGet(() -> cartRepository.save(Cart.createCart(product, accountDetail)));
+
+        cart.increaseAmount(1);
     }
 }

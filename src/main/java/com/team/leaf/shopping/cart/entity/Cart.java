@@ -25,7 +25,12 @@ public class Cart {
     @ManyToOne(fetch = FetchType.LAZY)
     private Product product;
 
-    private int amount;
+    @Builder.Default
+    private int amount = 0;
+
+    public void increaseAmount(int amount) {
+        this.amount += amount;
+    }
 
     public static Cart createCart(Product product, AccountDetail accountDetail) {
         return Cart.builder()
