@@ -23,13 +23,12 @@ public class Review {
     @CreationTimestamp
     private LocalDateTime reviewDate;
 
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY)
     private AccountDetail writer;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     private Product product;
 
     private String orderType;
-
 
 }
