@@ -1,6 +1,7 @@
 package com.team.leaf.common.init;
 
 import com.team.leaf.shopping.product.product.entity.Product;
+import com.team.leaf.shopping.product.product.entity.ProductOption;
 import com.team.leaf.shopping.product.product.repository.ProductRepository;
 import com.team.leaf.shopping.wish.entity.Wish;
 import com.team.leaf.shopping.wish.repository.WishRepository;
@@ -28,6 +29,13 @@ public class DataLoader implements CommandLineRunner {
         // 초기 데이터 저장
         // Product
         Product product1 = Product.builder().title("딸기 케이크").description("10년 경력의 베이킹 전문가가 만든 딸기 케이크입니다.").price(18000).discountRate(2.2).image("https://ibb.co/k27RhH2").saleRate(10).views(0).registrationDate(LocalDateTime.of(2018, 3, 6, 12, 30, 00)).build();
+        ProductOption color_option1 = ProductOption.builder().keyData("색상").valueData("blue").build();
+        ProductOption color_option2 = ProductOption.builder().keyData("색상").valueData("red").build();
+        ProductOption color_option3 = ProductOption.builder().keyData("색상").valueData("yellow").build();
+        product1.addProductOption(color_option1);
+        product1.addProductOption(color_option2);
+        product1.addProductOption(color_option3);
+
         Product product2 = Product.builder().title("휴지").description("1576칸으로 구성된 두루마니 휴지입니다. 멸균이 잘 되어있는 아주 깨끗한 휴지").price(3000).discountRate(1.7).image("https://ibb.co/FDGnKLc").saleRate(5).views(0).registrationDate(LocalDateTime.of(2021, 5, 1, 11, 26, 00)).build();
         Product product3 = Product.builder().title("후라이팬").description("총알도 거뜬히 막는 후라이팬, 대충 강해보이는 후라이팬 그렇다구요").price(9000).discountRate(1.8).image("https://ibb.co/LJNsDs2").saleRate(20).views(0).registrationDate(LocalDateTime.of(2019, 8, 1, 5, 0, 00)).build();
         Product product4 = Product.builder().title("신라면").description("전 국민이 좋아하는 신 라면, 옛날보다 버섯을 덜 넣어주지만 그래도 맛있어요").price(800).discountRate(1.0).image("https://ibb.co/sqdvg78").saleRate(0).views(0).registrationDate(LocalDateTime.of(2018, 3, 6, 12, 30, 00)).build();

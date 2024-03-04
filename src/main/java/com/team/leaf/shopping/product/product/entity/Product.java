@@ -1,5 +1,6 @@
 package com.team.leaf.shopping.product.product.entity;
 
+import com.team.leaf.shopping.product.category.entity.CategoryProduct;
 import com.team.leaf.shopping.product.review.entity.Review;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -7,7 +8,9 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.LinkedList;
 import java.util.List;
 
 @Entity
@@ -37,7 +40,24 @@ public class Product {
 
     private double discountRate;
 
-    @OneToMany(mappedBy = "product", cascade = {CascadeType.PERSIST, CascadeType.REMOVE}, orphanRemoval = true)
-    private List<Review> reviews;
+    private LocalDate deliveryStart;
 
+    private LocalDate productionTime;
+
+    @Builder.Default
+    @OneToMany(mappedBy = "product", cascade = {CascadeType.PERSIST, CascadeType.REMOVE}, orphanRemoval = true)
+    private List<Review> reviews = new LinkedList<>();;
+
+    @Builder.Default
+    @OneToMany(mappedBy = "product", cascade = {CascadeType.PERSIST, CascadeType.REMOVE}, orphanRemoval = true)
+    private List<CategoryProduct> categories = new LinkedList<>();;
+
+    @Builder.Default
+    @OneToMany(mappedBy = "product", cascade = {CascadeType.PERSIST, CascadeType.REMOVE}, orphanRemoval = true)
+    private List<ProductOption> productOptions = new LinkedList<>();
+
+    public void addProductOption(ProductOption option) {
+        productOptions.add(option);
+        option.setProduct(this);
+    }
 }

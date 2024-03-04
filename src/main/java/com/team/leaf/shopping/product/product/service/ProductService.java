@@ -1,5 +1,6 @@
 package com.team.leaf.shopping.product.product.service;
 
+import com.team.leaf.shopping.product.product.dto.ProductDetailResponse;
 import com.team.leaf.shopping.product.product.dto.ProductRequest;
 import com.team.leaf.shopping.product.product.dto.ProductResponse;
 import com.team.leaf.shopping.product.product.entity.Product;
@@ -14,6 +15,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -43,5 +45,10 @@ public class ProductService {
     public List<ProductResponse> getAllProductBySearch(Pageable pageable, ProductRequest request, String search) {
 
         return productRepository.getAllProductBySearch(pageable, request, search);
+    }
+
+    public ProductDetailResponse findProductByProductId(long productId) {
+        return productRepository.findProductByProductId(productId)
+                .orElseThrow(() -> new RuntimeException("not Fount Data"));
     }
 }
