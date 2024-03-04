@@ -3,11 +3,13 @@ package com.team.leaf.common.init;
 import com.team.leaf.shopping.product.product.entity.Product;
 import com.team.leaf.shopping.product.product.entity.ProductOption;
 import com.team.leaf.shopping.product.product.repository.ProductRepository;
+import com.team.leaf.shopping.product.review.entity.Review;
 import com.team.leaf.shopping.wish.entity.Wish;
 import com.team.leaf.shopping.wish.repository.WishRepository;
 import com.team.leaf.user.account.config.JwtSecurityConfig;
 import com.team.leaf.user.account.entity.AccountDetail;
 import com.team.leaf.user.account.repository.AccountRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
@@ -25,6 +27,7 @@ public class DataLoader implements CommandLineRunner {
     private final JwtSecurityConfig jwtSecurityConfig;
 
     @Override
+    @Transactional
     public void run(String... args) {
         // 초기 데이터 저장
         // Account
@@ -69,7 +72,17 @@ public class DataLoader implements CommandLineRunner {
         Product product9 = Product.builder().title("흑채").description("흑채.,. 내가 죽을 때 가지 쓸일이 없길 바라는 마음").price(18000).seller(accountDetail3).discountRate(5.0).image("https://ibb.co/rFtJzHg").saleRate(20).views(0).registrationDate(LocalDateTime.of(2018, 3, 6, 12, 30, 00)).build();
         Product product10 = Product.builder().title("꽃병").description("꽃병이다. 꽃을 넣을 수 있는 병이다. 그렇다고").price(5000).seller(accountDetail3).discountRate(6.2).image("https://ibb.co/zRZj4bF").saleRate(10).views(0).registrationDate(LocalDateTime.of(2018, 3, 6, 12, 30, 00)).build();
 
-
+        // Review
+        Review review1 = Review.builder().reviewDate(LocalDateTime.of(2019 , 4 , 15 , 12 , 30 , 00)).score(4).content("리뷰 데이터 1").writer(accountDetail2).product(product1).orderType("orderType").build();
+        Review review2 = Review.builder().reviewDate(LocalDateTime.of(2022 , 5 , 12 , 13 , 00 , 00)).score(2).content("리뷰 데이터 2").writer(accountDetail1).product(product1).orderType("orderType").build();
+        Review review3 = Review.builder().reviewDate(LocalDateTime.of(2018 , 9 , 21 , 8 , 15 , 00)).score(5).content("리뷰 데이터 3").writer(accountDetail3).product(product1).orderType("orderType").build();
+        Review review4 = Review.builder().reviewDate(LocalDateTime.of(2019 , 4 , 1 , 21 , 31 , 00)).score(1).content("리뷰 데이터 4").writer(accountDetail3).product(product2).orderType("orderType").build();
+        Review review5 = Review.builder().reviewDate(LocalDateTime.of(2019 , 6 , 7 , 18 , 53 , 00)).score(3).content("리뷰 데이터 5").writer(accountDetail2).product(product2).orderType("orderType").build();
+        product1.addReview(review1);
+        product1.addReview(review2);
+        product1.addReview(review3);
+        product2.addReview(review4);
+        product2.addReview(review5);
 
         // WishList
         Wish wish1 = Wish.builder().product(product1).user(accountDetail1).build();

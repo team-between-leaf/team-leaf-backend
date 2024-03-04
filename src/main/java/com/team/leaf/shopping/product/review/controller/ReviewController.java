@@ -16,7 +16,7 @@ public class ReviewController {
 
     private final ReviewService reviewService;
 
-    @GetMapping("/review/{productId}")
+    @GetMapping("/product/review/{productId}")
     public ApiResponse findReviewByProductId(@PathVariable long productId) {
         List<ReviewResponse> result =  reviewService.findReviewByProductId(productId);
 

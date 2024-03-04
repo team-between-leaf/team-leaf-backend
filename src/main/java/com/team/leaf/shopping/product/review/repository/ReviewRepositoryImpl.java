@@ -27,6 +27,7 @@ public class ReviewRepositoryImpl implements CustomReviewRepository {
                 ))
                 .from(review)
                 .innerJoin(review.product, product).on(product.productId.eq(productId))
+                .innerJoin(review.writer, accountDetail)
                 .fetch();
     }
 }

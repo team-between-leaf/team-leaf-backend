@@ -12,7 +12,7 @@ public class ReviewResponse {
 
     private long reviewId;
 
-    private long score;
+    private int score;
 
     private String content;
 

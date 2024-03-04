@@ -64,4 +64,8 @@ public class Product {
         productOptions.add(option);
         option.setProduct(this);
     }
+
+    public void addReview(Review review) {
+        this.reviews.add(review);
+    }
 }
