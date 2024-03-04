@@ -20,7 +20,7 @@ public class ProductController {
     private final ProductService productService;
 
     @GetMapping("/product")
-    @Operation(summary = "상품 데이터 가져오기")
+    @Operation(summary = "상품 데이터 목록 가져오기")
     public ApiResponse getAllProduct(Pageable pageable, @RequestBody ProductRequest request) {
 
         return new ApiResponse(productService.getAllProduct(pageable, request));
@@ -35,6 +35,7 @@ public class ProductController {
     }
 
     @GetMapping("/product/{productId}")
+    @Operation(summary= "특정 상품 상세 데이터 가져오기")
     public ApiResponse findProductByProductId(@PathVariable long productId) {
         ProductDetailResponse result = productService.findProductByProductId(productId);
 
