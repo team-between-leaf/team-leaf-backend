@@ -23,7 +23,7 @@ public class CouponRepositoryImpl implements CustomCouponRepository {
                         coupon.couponId,
                         coupon.couponName,
                         coupon.saleRate,
-                        coupon.saleRate
+                        coupon.downloadCondition
                 )).from(product)
                 .innerJoin(product.coupons, coupon)
                 .where(product.productId.eq(productId))
