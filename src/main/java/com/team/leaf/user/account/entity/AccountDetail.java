@@ -1,11 +1,12 @@
 package com.team.leaf.user.account.entity;
 
-import com.team.leaf.user.history.entity.SearchHistory;
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
-import java.util.List;
 
 import static com.team.leaf.user.account.entity.AccountPrivacy.createAccountPrivacy;
 
@@ -55,9 +56,6 @@ public class AccountDetail {
 
     @OneToOne(cascade = {CascadeType.PERSIST, CascadeType.REMOVE}, orphanRemoval = true, fetch = FetchType.LAZY)
     private AccountPrivacy userDetail;
-
-    @OneToMany(cascade = CascadeType.PERSIST, orphanRemoval = true)
-    private List<SearchHistory> searchHistories;
 
     public static AccountDetail joinAccount(String email, String encodedPassword, String phone, String nickname) {
         AccountDetail accountDetail = new AccountDetail();
