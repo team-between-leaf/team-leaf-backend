@@ -123,4 +123,28 @@ public class ProductRepositoryImpl implements CustomProductRepository {
 
         return Optional.ofNullable(result);
     }
+
+    @Override
+    public List<ProductResponse> findSellerProductByUserId(Pageable pageable, ProductRequest request, long userId) {
+        return jpaQueryFactory.select(Projections.constructor(ProductResponse.class,
+                        product.productId,
+                        product.title,
+                        product.description,
+                        product.price,
+                        product.image,
+                        product.registrationDate,
+                        product.saleRate,
+                        product.views,
+                        product.discountRate,
+                        review.score.avg()
+                ))
+                .from(product)
+                .innerJoin(product.seller, accountDetail).on(accountDetail.userId.eq(userId))
+                .leftJoin(product.reviews, review).on(review.product.eq(product))
+                .groupBy(product.productId)
+                .orderBy(request.getSortType().getSort())
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .fetch();
+    }
 }

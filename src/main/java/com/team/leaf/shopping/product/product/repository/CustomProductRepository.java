@@ -20,4 +20,5 @@ public interface CustomProductRepository {
 
     Optional<Product> findProductByProductIdAndSeller(long productId, AccountDetail accountDetail);
 
+    List<ProductResponse> findSellerProductByUserId(Pageable pageable, ProductRequest request, long userId);
 }
