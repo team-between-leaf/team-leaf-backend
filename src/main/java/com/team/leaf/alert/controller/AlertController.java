@@ -8,6 +8,7 @@ import com.team.leaf.user.account.entity.AccountDetail;
 import com.team.leaf.user.account.exception.ApiResponse;
 import com.team.leaf.user.account.exception.ApiResponseStatus;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
@@ -33,8 +34,8 @@ public class AlertController {
     }
 
     @PutMapping("/alert/notify")
-    @Operation(summary = "SSE 알림 설정 API")
-    public ApiResponse updateAlertNotify(@LogIn AccountDetail accountDetail, @RequestBody AlertRequest request) {
+    @Operation(summary = "SSE 알림 설정 API [ 사용자 인증 정보 필요 ]")
+    public ApiResponse updateAlertNotify(@LogIn @Parameter(hidden = true) AccountDetail accountDetail, @RequestBody AlertRequest request) {
         alertService.updateAlertNotify(accountDetail, request);
 
         return new ApiResponse(ApiResponseStatus.SUCCESS);
