@@ -6,6 +6,6 @@ import java.util.Optional;
 
 public interface CustomSellerRepository {
 
-    Optional<SellerProfileResponse> findSellerInfoById(long userId);
+    SellerProfileResponse findSellerInfoById(long userId);
 
 }

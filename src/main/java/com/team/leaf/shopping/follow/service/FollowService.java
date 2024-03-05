@@ -1,6 +1,11 @@
 package com.team.leaf.shopping.follow.service;
 
+import com.team.leaf.shopping.follow.dto.FollowRequest;
+import com.team.leaf.shopping.follow.entity.Follow;
 import com.team.leaf.shopping.follow.repository.FollowRepository;
+import com.team.leaf.user.account.entity.AccountDetail;
+import com.team.leaf.user.account.repository.AccountRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -9,5 +14,14 @@ import org.springframework.stereotype.Service;
 public class FollowService {
 
     private final FollowRepository followRepository;
+    private final AccountRepository accountRepository;
 
+    @Transactional
+    public void addFollow(AccountDetail accountDetail, FollowRequest request) {
+        AccountDetail targetUser = accountRepository.findById(request.getUserId())
+                .orElseThrow(() -> new RuntimeException("not found User"));
+
+        Follow follow = Follow.createFollow(targetUser, accountDetail);
+        followRepository.save(follow);
+    }
 }

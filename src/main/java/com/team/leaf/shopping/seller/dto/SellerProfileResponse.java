@@ -13,8 +13,16 @@ public class SellerProfileResponse {
     @Setter
     private long followUser;
 
-    public SellerProfileResponse(double totalRating) {
-        this.totalRating = totalRating;
+    public static SellerProfileResponse createResponse(Double totalRating, Long followUser) {
+        if(totalRating == null) {
+            totalRating = 0.0;
+        }
+
+        if(followUser == null) {
+            followUser = 0L;
+        }
+
+        return new SellerProfileResponse(totalRating, followUser);
     }
 
 }

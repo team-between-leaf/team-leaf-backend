@@ -13,7 +13,6 @@ public class SellerService {
 
     public SellerProfileResponse getSellerInfoById(long userId) {
 
-
-    return null;
+        return sellerRepository.findSellerInfoById(userId);
     }
 }

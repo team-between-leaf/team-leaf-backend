@@ -20,28 +20,22 @@ public class SellerRepositoryImpl implements CustomSellerRepository {
     private final JPAQueryFactory jpaQueryFactory;
 
     @Override
-    public Optional<SellerProfileResponse> findSellerInfoById(long userId) {
-        QAccountDetail followingUser = new QAccountDetail("followingUser");
-        QAccountDetail followerUser = new QAccountDetail("followerUser");
+    public SellerProfileResponse findSellerInfoById(long userId) {
+        QAccountDetail targetUser = new QAccountDetail("targetUser");
+        QAccountDetail selfUser = new QAccountDetail("selfUser");
 
-        SellerProfileResponse result = jpaQueryFactory.select(
-                        Projections.constructor(SellerProfileResponse.class,
-                                review.score.avg()
-                        )
-                ).from(product)
+        Double reviewScore = jpaQueryFactory.select(review.score.avg())
+                .from(product)
                 .innerJoin(product.seller, accountDetail).on(accountDetail.userId.eq(userId))
                 .leftJoin(product.reviews, review)
-                .groupBy(product.productId)
                 .fetchOne();
 
-        long followedCount = jpaQueryFactory.select(followerUser.count())
+        Long followedCount = jpaQueryFactory.select(selfUser.count())
                 .from(follow)
-                .innerJoin(follow.following, followingUser).on(followingUser.userId.eq(userId))
-                .leftJoin(follow.follower, followerUser)
+                .innerJoin(follow.targetUser, targetUser).on(targetUser.userId.eq(userId))
+                .leftJoin(follow.selfUser, selfUser)
                 .fetchOne();
 
-        result.setFollowUser(followedCount);
-
-        return Optional.ofNullable(result);
+        return SellerProfileResponse.createResponse(reviewScore, followedCount);
     }
 }

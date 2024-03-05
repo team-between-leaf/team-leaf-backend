@@ -19,9 +19,16 @@ public class Follow {
     private long followId;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    private AccountDetail follower;
+    private AccountDetail targetUser; // 대상
 
     @ManyToOne(fetch = FetchType.LAZY)
-    private AccountDetail following;
+    private AccountDetail selfUser; // 기준
+
+    public static Follow createFollow(AccountDetail targetUser, AccountDetail selfUser) {
+        return Follow.builder()
+                .targetUser(targetUser)
+                .selfUser(selfUser)
+                .build();
+    }
 
 }
