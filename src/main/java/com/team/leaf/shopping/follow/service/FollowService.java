@@ -22,6 +22,18 @@ public class FollowService {
                 .orElseThrow(() -> new RuntimeException("not found User"));
 
         Follow follow = Follow.createFollow(targetUser, accountDetail);
+        if(followRepository.findFollowByTargetUserAndSelfUser(targetUser, accountDetail).isPresent()) {
+            throw new RuntimeException("이미 팔로우 중인 사용자입니다.");
+        }
+
         followRepository.save(follow);
+    }
+
+    @Transactional
+    public void deleteFollow(AccountDetail accountDetail, FollowRequest request) {
+        AccountDetail targetUser = accountRepository.findById(request.getUserId())
+                .orElseThrow(() -> new RuntimeException("not found User"));
+
+        followRepository.deleteByTargetUserAndSelfUser(targetUser, accountDetail);
     }
 }
