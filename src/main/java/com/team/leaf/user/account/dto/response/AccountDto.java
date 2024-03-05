@@ -20,6 +20,7 @@ public class AccountDto {
     private String shippingAddress;
     private String schoolAddress;
     private String workAddress;
+    private String image;
 
     public AccountDto(AccountDetail accountDetail) {
         this.id = accountDetail.getUserId();
@@ -35,6 +36,7 @@ public class AccountDto {
         this.shippingAddress = accountDetail.getShippingAddress();
         this.schoolAddress = accountDetail.getSchoolAddress();
         this.workAddress = accountDetail.getWorkAddress();
+        this.image = accountDetail.getUserDetail().getImage();
     }
 
 }
