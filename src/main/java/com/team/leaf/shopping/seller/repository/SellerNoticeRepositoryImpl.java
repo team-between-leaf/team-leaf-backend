@@ -2,11 +2,9 @@ package com.team.leaf.shopping.seller.repository;
 
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import com.team.leaf.shopping.seller.dto.SellerNoticeRequest;
 import com.team.leaf.shopping.seller.dto.SellerNoticeResponse;
 import com.team.leaf.shopping.seller.dto.SellerProfileResponse;
 import com.team.leaf.user.account.entity.QAccountDetail;
-import com.team.leaf.user.account.entity.QAccountPrivacy;
 import lombok.RequiredArgsConstructor;
 
 import static com.team.leaf.shopping.seller.entity.QSellerNotice.sellerNotice;
@@ -19,12 +17,12 @@ import java.util.List;
 import java.util.Optional;
 
 @RequiredArgsConstructor
-public class SellerRepositoryImpl implements CustomSellerRepository {
+public class SellerNoticeRepositoryImpl implements CustomSellerNoticeRepository {
 
     private final JPAQueryFactory jpaQueryFactory;
 
     @Override
-    public SellerProfileResponse findSellerInfoById(long userId) {
+    public SellerProfileResponse findSellerInfoByUserId(long userId) {
         QAccountDetail targetUser = new QAccountDetail("targetUser");
         QAccountDetail selfUser = new QAccountDetail("selfUser");
 
@@ -54,7 +52,7 @@ public class SellerRepositoryImpl implements CustomSellerRepository {
                         sellerNotice.writeDate
                 ))
                 .from(sellerNotice)
-                .innerJoin(sellerNotice.writer, accountDetail)
+                .innerJoin(sellerNotice.writer, accountDetail).on(accountDetail.userId.eq(userId))
                 .fetch();
     }
 

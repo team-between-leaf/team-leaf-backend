@@ -6,9 +6,9 @@ import com.team.leaf.shopping.seller.dto.SellerProfileResponse;
 import java.util.List;
 import java.util.Optional;
 
-public interface CustomSellerRepository {
+public interface CustomSellerNoticeRepository {
 
-    SellerProfileResponse findSellerInfoById(long userId);
+    SellerProfileResponse findSellerInfoByUserId(long userId);
 
     List<SellerNoticeResponse> findSellerNoticeByUserId(long userId);
 

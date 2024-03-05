@@ -20,7 +20,7 @@ public class SellerService {
 
     public SellerProfileResponse getSellerInfoById(long userId) {
 
-        return sellerRepository.findSellerInfoById(userId);
+        return sellerRepository.findSellerInfoByUserId(userId);
     }
 
     @Transactional
