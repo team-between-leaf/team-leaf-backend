@@ -4,7 +4,7 @@ import com.team.leaf.common.custom.LogIn;
 import com.team.leaf.shopping.seller.dto.SellerNoticeRequest;
 import com.team.leaf.shopping.seller.dto.SellerNoticeResponse;
 import com.team.leaf.shopping.seller.dto.SellerProfileResponse;
-import com.team.leaf.shopping.seller.service.SellerService;
+import com.team.leaf.shopping.seller.service.SellerNoticeService;
 import com.team.leaf.user.account.entity.AccountDetail;
 import com.team.leaf.user.account.exception.ApiResponse;
 import com.team.leaf.user.account.exception.ApiResponseStatus;
@@ -18,9 +18,9 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/seller")
-public class SellerController {
+public class SellerNoticeController {
 
-    private final SellerService sellerService;
+    private final SellerNoticeService sellerService;
 
     @GetMapping("/info/{userId}")
     @Operation(summary = "판매자 정보의 통계를 가져오는 API ( 총 평점, 팔로우 수 )")

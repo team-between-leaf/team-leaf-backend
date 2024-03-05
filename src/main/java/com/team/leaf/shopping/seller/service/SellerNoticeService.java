@@ -14,7 +14,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class SellerService {
+public class SellerNoticeService {
 
     private final SellerNoticeRepository sellerRepository;
 
