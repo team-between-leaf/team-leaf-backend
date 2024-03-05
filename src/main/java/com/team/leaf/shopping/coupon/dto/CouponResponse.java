@@ -10,6 +10,8 @@ public class CouponResponse {
 
     private long couponId;
 
+    private long productId;
+
     private String couponName;
 
     private double saleRate;

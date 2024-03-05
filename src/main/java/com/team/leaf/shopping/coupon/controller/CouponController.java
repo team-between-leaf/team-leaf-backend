@@ -36,6 +36,14 @@ public class CouponController {
         return new ApiResponse(result);
     }
 
+    @GetMapping("/product/coupon/{userId}")
+    @Operation(summary = "특정 판매자가 등록한 쿠폰 목록")
+    public ApiResponse findCouponByUserId(@PathVariable long userId) {
+        List<CouponResponse> result = couponService.findCouponByUserId(userId);
+
+        return new ApiResponse(result);
+    }
+
     @PostMapping("/product/{productId}/coupon/download/{couponId}")
     @Operation(summary= "상품에 등록된 쿠폰 다운로드 API [ 사용자 인증 정보 필요 ] ")
     public ApiResponse downloadCoupon(@PathVariable long productId, @PathVariable long couponId, @Parameter(hidden = true) @LogIn AccountDetail accountDetail) {

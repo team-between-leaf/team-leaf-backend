@@ -8,4 +8,6 @@ public interface CustomCouponRepository {
 
     List<CouponResponse> findCouponByProductId(long productId);
 
+    List<CouponResponse> findCouponByUserId(long userId);
+
 }
