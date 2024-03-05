@@ -1,13 +1,18 @@
 package com.team.leaf.shopping.product.product.entity;
 
+import com.team.leaf.shopping.coupon.entity.Coupon;
+import com.team.leaf.shopping.product.category.entity.CategoryProduct;
 import com.team.leaf.shopping.product.review.entity.Review;
+import com.team.leaf.user.account.entity.AccountDetail;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.LinkedList;
 import java.util.List;
 
 @Entity
@@ -37,7 +42,40 @@ public class Product {
 
     private double discountRate;
 
-    @OneToMany(mappedBy = "product", cascade = {CascadeType.PERSIST, CascadeType.REMOVE}, orphanRemoval = true)
-    private List<Review> reviews;
+    private LocalDate deliveryStart;
 
+    private LocalDate productionTime;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    private AccountDetail seller;
+
+    @Builder.Default
+    @OneToMany(mappedBy = "product", cascade = {CascadeType.PERSIST, CascadeType.REMOVE}, orphanRemoval = true)
+    private List<Review> reviews = new LinkedList<>();
+
+    @Builder.Default
+    @OneToMany(mappedBy = "product", cascade = {CascadeType.PERSIST, CascadeType.REMOVE}, orphanRemoval = true)
+    private List<CategoryProduct> categories = new LinkedList<>();
+
+    @Builder.Default
+    @OneToMany(mappedBy = "product", cascade = {CascadeType.PERSIST, CascadeType.REMOVE}, orphanRemoval = true)
+    private List<ProductOption> productOptions = new LinkedList<>();
+
+    @Builder.Default
+    @OneToMany(mappedBy = "product", cascade = {CascadeType.PERSIST, CascadeType.REMOVE}, orphanRemoval = true)
+    private List<Coupon> coupons = new LinkedList<>();
+
+    public void addProductOption(ProductOption option) {
+        productOptions.add(option);
+        option.setProduct(this);
+    }
+
+    public void addCoupon(Coupon coupon) {
+        coupons.add(coupon);
+        coupon.setProduct(this);
+    }
+
+    public void addReview(Review review) {
+        this.reviews.add(review);
+    }
 }

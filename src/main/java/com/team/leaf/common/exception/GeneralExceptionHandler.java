@@ -10,6 +10,11 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 public class GeneralExceptionHandler {
 
     @ExceptionHandler({AccountException.class})
+    public ResponseEntity handleAccountException(Exception e) {
+        return ResponseEntity.badRequest().body(MessageResponse.createResponse(e.getMessage()));
+    }
+
+    @ExceptionHandler(Exception.class)
     public ResponseEntity handleGlobalException(Exception e) {
         return ResponseEntity.badRequest().body(MessageResponse.createResponse(e.getMessage()));
     }

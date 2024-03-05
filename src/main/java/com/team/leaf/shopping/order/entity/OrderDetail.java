@@ -15,9 +15,9 @@ public class OrderDetail {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long orderId;
 
-    private int count;
+    private int productCount;
 
-    private int price;
+    private int totalPrice;
 
     private String commission;
 
@@ -29,7 +29,7 @@ public class OrderDetail {
     private OrderPaymentDetail orderDetail;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    private AccountDetail orderer;
+    private AccountDetail accountDetail;
 
     @ManyToOne(fetch = FetchType.LAZY)
     private Product product;

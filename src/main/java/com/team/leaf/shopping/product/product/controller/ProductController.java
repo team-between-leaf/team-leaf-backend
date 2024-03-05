@@ -1,5 +1,6 @@
 package com.team.leaf.shopping.product.product.controller;
 
+import com.team.leaf.shopping.product.product.dto.ProductDetailResponse;
 import com.team.leaf.shopping.product.product.dto.ProductRequest;
 import com.team.leaf.shopping.product.product.service.ProductService;
 import com.team.leaf.user.account.exception.ApiResponse;
@@ -8,6 +9,7 @@ import com.team.leaf.user.account.jwt.PrincipalDetails;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,7 +20,7 @@ public class ProductController {
     private final ProductService productService;
 
     @GetMapping("/product")
-    @Operation(summary = "상품 데이터 가져오기")
+    @Operation(summary = "상품 데이터 목록 가져오기")
     public ApiResponse getAllProduct(Pageable pageable, @RequestBody ProductRequest request) {
 
         return new ApiResponse(productService.getAllProduct(pageable, request));
@@ -32,7 +34,15 @@ public class ProductController {
         return new ApiResponse(ApiResponseStatus.SUCCESS);
     }
 
-    @GetMapping("/product/{search}")
+    @GetMapping("/product/{productId}")
+    @Operation(summary= "특정 상품 상세 데이터 가져오기")
+    public ApiResponse findProductByProductId(@PathVariable long productId) {
+        ProductDetailResponse result = productService.findProductByProductId(productId);
+
+        return new ApiResponse(result);
+    }
+
+    @GetMapping("/product/search/{search}")
     @Operation(summary = "검색어를 통해 상품 데이터 가져오기")
     public ApiResponse getAllProductBySearch(Pageable pageable, @RequestBody ProductRequest request, @PathVariable String search) {
 
