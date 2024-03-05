@@ -17,4 +17,7 @@ public class ReviewService {
         return reviewRepository.findReviewByProductId(productId);
     }
 
+    public List<ReviewResponse> findReviewByUserId(long userId) {
+        return reviewRepository.findReviewByUserId(userId);
+    }
 }
