@@ -5,12 +5,9 @@ import com.team.leaf.shopping.product.product.dto.ProductRequest;
 import com.team.leaf.shopping.product.product.service.ProductService;
 import com.team.leaf.user.account.exception.ApiResponse;
 import com.team.leaf.user.account.exception.ApiResponseStatus;
-import com.team.leaf.user.account.jwt.PrincipalDetails;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -24,6 +21,13 @@ public class ProductController {
     public ApiResponse getAllProduct(Pageable pageable, @RequestBody ProductRequest request) {
 
         return new ApiResponse(productService.getAllProduct(pageable, request));
+    }
+
+    @GetMapping("/product/seller/{userId}")
+    @Operation(summary = "판매자의 상품 데이터 목록 가져오기")
+    public ApiResponse findSellerProductByUserId(Pageable pageable, @RequestBody ProductRequest request, @PathVariable long userId) {
+
+        return new ApiResponse(productService.findSellerProductByUserId(pageable, request, userId));
     }
 
     @PostMapping("/product/{productId}/wish-list")

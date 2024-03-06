@@ -15,11 +15,13 @@ public class AccountDto {
     private AccountRole role;
     private String phone;
     private String birthday;
-    private String birthyear;
+    private String birthYear;
     private String universityName;
     private String shippingAddress;
     private String schoolAddress;
     private String workAddress;
+    private String sellerIntroduce;
+    private String image;
 
     public AccountDto(AccountDetail accountDetail) {
         this.id = accountDetail.getUserId();
@@ -30,11 +32,13 @@ public class AccountDto {
         this.role = accountDetail.getRole();
         this.phone = accountDetail.getPhone();
         this.birthday = accountDetail.getBirthday();
-        this.birthyear = accountDetail.getBirthyear();
+        this.birthYear = accountDetail.getBirthyear();
         this.universityName = accountDetail.getUniversityName();
         this.shippingAddress = accountDetail.getShippingAddress();
         this.schoolAddress = accountDetail.getSchoolAddress();
         this.workAddress = accountDetail.getWorkAddress();
+        this.image = accountDetail.getUserDetail().getImage();
+        this.sellerIntroduce = accountDetail.getUserDetail().getSellerIntroduce();
     }
 
 }

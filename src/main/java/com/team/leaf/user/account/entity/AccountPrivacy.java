@@ -18,6 +18,8 @@ public class AccountPrivacy {
 
     private boolean isStudent;
 
+    private String sellerIntroduce;
+
     private String Image;
 
     private boolean isOrderDeliveryNotify;

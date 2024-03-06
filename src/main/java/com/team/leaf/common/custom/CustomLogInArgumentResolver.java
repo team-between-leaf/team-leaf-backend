@@ -3,6 +3,7 @@ package com.team.leaf.common.custom;
 import com.team.leaf.user.account.entity.AccountDetail;
 import com.team.leaf.user.account.jwt.JwtTokenUtil;
 import com.team.leaf.user.account.repository.AccountRepository;
+import io.swagger.v3.oas.annotations.Parameter;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.MethodParameter;

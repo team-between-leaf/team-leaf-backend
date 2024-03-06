@@ -1,5 +1,7 @@
 package com.team.leaf.common.init;
 
+import com.team.leaf.shopping.follow.entity.Follow;
+import com.team.leaf.shopping.follow.repository.FollowRepository;
 import com.team.leaf.shopping.product.product.entity.Product;
 import com.team.leaf.shopping.product.product.entity.ProductOption;
 import com.team.leaf.shopping.product.product.repository.ProductRepository;
@@ -25,6 +27,7 @@ public class DataLoader implements CommandLineRunner {
     private final AccountRepository accountRepository;
     private final WishRepository wishRepository;
     private final JwtSecurityConfig jwtSecurityConfig;
+    private final FollowRepository followRepository;
 
     @Override
     @Transactional
@@ -52,6 +55,19 @@ public class DataLoader implements CommandLineRunner {
                         "01046816563",
                         "Seller4512")));
         accountDetail3.getUserDetail().updateProfileImage("imageUrl");
+
+        AccountDetail accountDetail4 = accountRepository.findByEmail("buyer1234@naver.com")
+                .orElseGet(() -> accountRepository.save(AccountDetail.joinAccount(
+                        "buyer1234@naver.com",
+                        jwtSecurityConfig.passwordEncoder().encode("Qwer1234"),
+                        "01051216598",
+                        "buyer1234")));
+
+        // Follow
+        Follow follow1 = Follow.createFollow(accountDetail1 , accountDetail4);
+        Follow follow2 = Follow.createFollow(accountDetail1 , accountDetail2);
+        Follow follow3 = Follow.createFollow(accountDetail2 , accountDetail4);
+        Follow follow4 = Follow.createFollow(accountDetail3 , accountDetail4);
 
         // Product
         Product product1 = Product.builder().title("딸기 케이크").description("10년 경력의 베이킹 전문가가 만든 딸기 케이크입니다.").price(18000).seller(accountDetail3).discountRate(2.2).image("https://ibb.co/k27RhH2").saleRate(10).views(0).registrationDate(LocalDateTime.of(2018, 3, 6, 12, 30, 00)).build();
@@ -96,5 +112,6 @@ public class DataLoader implements CommandLineRunner {
 
         productRepository.saveAll(Arrays.asList(product1, product2, product3, product4, product5, product6, product7, product8, product9, product10));
         wishRepository.saveAll(Arrays.asList(wish1, wish2, wish3, wish4, wish5, wish6, wish7, wish8));
+        followRepository.saveAll(Arrays.asList(follow1, follow2, follow3, follow4));
     }
 }

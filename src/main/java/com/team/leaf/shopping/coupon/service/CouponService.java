@@ -47,4 +47,8 @@ public class CouponService {
         DownloadCoupon downloadCoupon = DownloadCoupon.createDownloadCoupon(accountDetail, coupon);
         downloadCouponRepository.save(downloadCoupon);
     }
+
+    public List<CouponResponse> findCouponByUserId(long userId) {
+        return couponRepository.findCouponByUserId(userId);
+    }
 }

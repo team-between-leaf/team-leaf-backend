@@ -186,9 +186,11 @@ public class AccountService {
 
 
     //유저 정보 조회
+    @Transactional
     public AccountDto getAccount(String email) {
         AccountDetail accountDetail = accountRepository.findByEmail(email).orElseThrow(() ->
                 new RuntimeException("사용자를 찾을 수 없습니다."));
+
         return new AccountDto(accountDetail);
     }
 

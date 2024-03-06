@@ -8,4 +8,5 @@ public interface CustomReviewRepository {
 
     List<ReviewResponse> findReviewByProductId(long productId);
 
+    List<ReviewResponse> findReviewByUserId(long userId);
 }

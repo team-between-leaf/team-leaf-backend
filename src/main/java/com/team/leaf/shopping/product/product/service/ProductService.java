@@ -8,6 +8,7 @@ import com.team.leaf.shopping.product.product.repository.ProductRepository;
 import com.team.leaf.shopping.wish.entity.Wish;
 import com.team.leaf.shopping.wish.repository.WishRepository;
 import com.team.leaf.user.account.entity.AccountDetail;
+import com.team.leaf.user.account.exception.ApiResponseStatus;
 import com.team.leaf.user.account.jwt.JwtTokenUtil;
 import com.team.leaf.user.account.repository.AccountRepository;
 import lombok.RequiredArgsConstructor;
@@ -50,5 +51,10 @@ public class ProductService {
     public ProductDetailResponse findProductByProductId(long productId) {
         return productRepository.findProductByProductId(productId)
                 .orElseThrow(() -> new RuntimeException("not Fount Data"));
+    }
+
+    public List<ProductResponse> findSellerProductByUserId(Pageable pageable, ProductRequest request, long userId) {
+
+        return productRepository.findSellerProductByUserId(pageable, request, userId);
     }
 }

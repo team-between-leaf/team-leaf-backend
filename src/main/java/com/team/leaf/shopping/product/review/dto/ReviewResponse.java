@@ -12,6 +12,8 @@ public class ReviewResponse {
 
     private long reviewId;
 
+    private long productId;
+
     private int score;
 
     private String content;

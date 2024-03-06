@@ -25,4 +25,12 @@ public class ReviewController {
         return new ApiResponse(result);
     }
 
+    @GetMapping("/product/review/user/{userId}")
+    @Operation(summary= "특정 사용자가 등록된 리뷰 가져오기 API")
+    public ApiResponse findReviewByUserId(@PathVariable long userId) {
+        List<ReviewResponse> result =  reviewService.findReviewByUserId(userId);
+
+        return new ApiResponse(result);
+    }
+
 }
