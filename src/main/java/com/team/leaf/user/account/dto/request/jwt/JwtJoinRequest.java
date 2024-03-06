@@ -1,10 +1,10 @@
-package com.team.leaf.user.account.dto.request;
+package com.team.leaf.user.account.dto.request.jwt;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 
 @Data
-public class JoinRequest {
+public class JwtJoinRequest {
 
     @NotBlank(message = "로그인 아이디가 비어있습니다.")
     private String email;
@@ -21,7 +21,7 @@ public class JoinRequest {
     @NotBlank(message = "핸드폰 번호가 비어있습니다.")
     private String phone;
 
-    public JoinRequest(String email, String password, String passwordCheck, String nickname, String phone) {
+    public JwtJoinRequest(String email, String password, String passwordCheck, String nickname, String phone) {
         this.email = email;
         this.password = password;
         this.passwordCheck = passwordCheck;
