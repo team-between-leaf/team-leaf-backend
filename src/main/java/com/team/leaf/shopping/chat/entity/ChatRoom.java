@@ -28,6 +28,7 @@ public class ChatRoom {
     private AccountDetail buyer;
 
     @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.REMOVE}, orphanRemoval = true)
+    @Builder.Default
     private List<Chat> ChatData = new LinkedList<>();
 
 }
