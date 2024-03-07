@@ -75,4 +75,24 @@ public class ChatRepositoryImpl implements CustomChatRepository {
                 .fetch();
     }
 
+    @Override
+    public List<ChatDataResponse> findChatDataBySellerAndBuyer(long sellerUserId, long buyerUserId) {
+        QAccountDetail seller = new QAccountDetail("seller");
+        QAccountDetail buyer = new QAccountDetail("buyer");
+
+        return jpaQueryFactory.select(Projections.constructor(
+                                ChatDataResponse.class,
+                                chat.message,
+                                chat.writeTime,
+                                accountDetail.nickname
+                        )
+                )
+                .from(chatRoom)
+                .innerJoin(chatRoom.seller, seller).on(seller.userId.eq(sellerUserId))
+                .innerJoin(chatRoom.buyer, buyer).on(buyer.userId.eq(buyerUserId))
+                .innerJoin(chatRoom.ChatData, chat)
+                .innerJoin(chat.writer, accountDetail)
+                .fetch();
+    }
+
 }

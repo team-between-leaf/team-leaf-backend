@@ -13,4 +13,6 @@ public interface CustomChatRepository {
 
     List<ChatDataResponse> findChatDataByChatRoomId(long chatRoomId);
 
+    List<ChatDataResponse> findChatDataBySellerAndBuyer(long sellerUserId, long buyerUserId);
+
 }
