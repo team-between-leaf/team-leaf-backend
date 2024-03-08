@@ -42,7 +42,7 @@ public class ChatService {
     @Transactional
     private ChatRoom createChatRoomIfNoChatRoom(long sellerUserId, long buyerUserId) {
         return chatRepository.findChatRoomBySellerAndBuyer(sellerUserId, buyerUserId)
-                .orElseGet(() -> createChatRoom(sellerUserId, buyerUserId));
+                .orElseGet(() -> chatRepository.save(createChatRoom(sellerUserId, buyerUserId)));
     }
 
     private ChatRoom createChatRoom(long sellerUserId, long buyerUserId) {

@@ -37,7 +37,7 @@ public class ChatRoomRepositoryImpl implements CustomChatRoomRepository {
                 )
                 .from(chatRoom)
                 .innerJoin(chatRoom.seller, seller).on(seller.userId.eq(userId))
-                .leftJoin(chatRoom.buyer, buyer)
+                .innerJoin(chatRoom.buyer, buyer)
                 .fetch();
     }
 
@@ -56,8 +56,8 @@ public class ChatRoomRepositoryImpl implements CustomChatRoomRepository {
                         )
                 )
                 .from(chatRoom)
-                .innerJoin(chatRoom.buyer, buyer).on(seller.userId.eq(userId))
-                .leftJoin(chatRoom.seller, seller)
+                .innerJoin(chatRoom.buyer, buyer).on(buyer.userId.eq(userId))
+                .innerJoin(chatRoom.seller, seller)
                 .fetch();
     }
 
@@ -71,7 +71,7 @@ public class ChatRoomRepositoryImpl implements CustomChatRoomRepository {
                         )
                 )
                 .from(chatRoom)
-                .innerJoin(chatRoom.ChatData, chat)
+                .innerJoin(chatRoom.chatData, chat)
                 .innerJoin(chat.writer, accountDetail)
                 .where(chatRoom.chatRoomId.eq(chatRoomId))
                 .fetch();
@@ -92,7 +92,7 @@ public class ChatRoomRepositoryImpl implements CustomChatRoomRepository {
                 .from(chatRoom)
                 .innerJoin(chatRoom.seller, seller).on(seller.userId.eq(sellerUserId))
                 .innerJoin(chatRoom.buyer, buyer).on(buyer.userId.eq(buyerUserId))
-                .innerJoin(chatRoom.ChatData, chat)
+                .innerJoin(chatRoom.chatData, chat)
                 .innerJoin(chat.writer, accountDetail)
                 .fetch();
     }
@@ -106,6 +106,17 @@ public class ChatRoomRepositoryImpl implements CustomChatRoomRepository {
                 .from(chatRoom)
                 .innerJoin(chatRoom.seller, seller).on(seller.userId.eq(sellerUserId))
                 .innerJoin(chatRoom.buyer, buyer).on(buyer.userId.eq(buyerUserId))
+                .fetchOne();
+
+        return Optional.ofNullable(result);
+    }
+
+    @Override
+    public Optional<ChatRoom> findChatRoomAndChatDataById(long chatRoomId) {
+        ChatRoom result = jpaQueryFactory.select(chatRoom)
+                .from(chatRoom)
+                .leftJoin(chatRoom.chatData).fetchJoin()
+                .where(chatRoom.chatRoomId.eq(chatRoomId))
                 .fetchOne();
 
         return Optional.ofNullable(result);

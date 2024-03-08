@@ -1,13 +1,12 @@
 package com.team.leaf.socket.handler;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.team.leaf.shopping.chat.dto.ChatMessageRequest;
 import com.team.leaf.shopping.chat.dto.ChatMessageResponse;
-import com.team.leaf.shopping.chat.dto.ChatRoomResponse;
 import com.team.leaf.shopping.chat.dto.MessageType;
 import com.team.leaf.shopping.chat.entity.Chat;
 import com.team.leaf.shopping.chat.entity.ChatRoom;
+import com.team.leaf.shopping.chat.repository.ChatRepository;
 import com.team.leaf.shopping.chat.repository.ChatRoomRepository;
 import com.team.leaf.user.account.entity.AccountDetail;
 import com.team.leaf.user.account.repository.AccountRepository;
@@ -20,51 +19,47 @@ import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.*;
 
 @Component
 @RequiredArgsConstructor
 public class WebSocketHandler extends TextWebSocketHandler {
 
     private final ObjectMapper mapper;
-    private static final ConcurrentHashMap<String, WebSocketSession> CLIENTS = new ConcurrentHashMap<>();
-    private static final Map<Long, Set<WebSocketSession>> CHAT_ROOM = new HashMap<>();
+    private static final Map<Long, List<WebSocketSession>> CHAT_ROOM = new HashMap<>();
+    private final ChatRepository chatRepository;
     private final ChatRoomRepository chatRoomRepository;
     private final AccountRepository accountRepository;
 
     @Override
-    public void afterConnectionEstablished(WebSocketSession session) {
-        CLIENTS.put(session.getId(), session);
-    }
-
-    @Override
+    @Transactional
     protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
         ChatMessageRequest body = mapper.readValue(message.getPayload(), ChatMessageRequest.class);
         long chatRoomId = body.getChatRoomId();
 
-        if(!CHAT_ROOM.containsKey(chatRoomId)) {
-            CHAT_ROOM.put(chatRoomId, new HashSet<>());
-        }
-
-        Set<WebSocketSession> webSocketSessions = CHAT_ROOM.get(chatRoomId);
         if(body.getMessageType().equals(MessageType.ENTER)) {
-            CHAT_ROOM.get(chatRoomId).add(session);
+            joinChatRoom(chatRoomId, session);
         }
 
         if(body.getMessageType().equals(MessageType.SEND)) {
             AccountDetail sender = saveChatData(body);
 
-            sendMessage(webSocketSessions, body, sender);
+            sendMessage(body, sender);
         }
     }
 
-    @Transactional
+    private void joinChatRoom(long chatRoomId, WebSocketSession session) {
+        if(!CHAT_ROOM.containsKey(chatRoomId)) {
+            CHAT_ROOM.put(chatRoomId, new ArrayList<>());
+        }
+        List<WebSocketSession> sessions = CHAT_ROOM.get(chatRoomId);
+        if(!sessions.contains(session)) {
+            sessions.add(session);
+        }
+    }
+
     private AccountDetail saveChatData(ChatMessageRequest body) {
-        ChatRoom chatRoom = chatRoomRepository.findById(body.getChatRoomId())
+        ChatRoom chatRoom = chatRoomRepository.findChatRoomAndChatDataById(body.getChatRoomId())
                 .orElseThrow(() -> new RuntimeException("해당 채팅방을 찾을 수 없습니다."));
 
         AccountDetail accountDetail = accountRepository.findById(body.getUserId())
@@ -73,18 +68,32 @@ public class WebSocketHandler extends TextWebSocketHandler {
         Chat chat = Chat.createChat(accountDetail, body.getMessage());
         chatRoom.addChatData(chat);
 
+        chatRepository.save(chat);
+
         return accountDetail;
     }
 
     @Override
     public void afterConnectionClosed(WebSocketSession session, CloseStatus status) {
-        CLIENTS.remove(session.getId());
+        for(long chatRoomId : CHAT_ROOM.keySet()) {
+            List<WebSocketSession> webSocketSessions = CHAT_ROOM.get(chatRoomId);
+
+            for(int i = 0; i < webSocketSessions.size(); i++) {
+                WebSocketSession socket = webSocketSessions.get(i);
+
+                if(socket.getId().equals(session.getId())) {
+                    webSocketSessions.remove(i);
+                    break;
+                }
+            }
+        }
     }
 
-    private void sendMessage(Set<WebSocketSession> webSocketSessions, ChatMessageRequest body, AccountDetail sender) throws IOException {
+    private void sendMessage(ChatMessageRequest body, AccountDetail sender) throws IOException {
+        List<WebSocketSession> sessions = CHAT_ROOM.get(body.getChatRoomId());
         ChatMessageResponse response = ChatMessageResponse.createChatMessageResponse(body.getMessage(), sender);
 
-        for(WebSocketSession sessionData : webSocketSessions) {
+        for(WebSocketSession sessionData : sessions) {
             sessionData.sendMessage(new TextMessage(mapper.writeValueAsString(response)));
         }
     }

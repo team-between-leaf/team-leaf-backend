@@ -1,9 +1,11 @@
 package com.team.leaf.shopping.chat.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import lombok.AllArgsConstructor;
 
 import java.time.LocalDateTime;
 
+@AllArgsConstructor
 public class ChatDataResponse {
 
     private String message;

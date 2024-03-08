@@ -19,4 +19,5 @@ public interface CustomChatRoomRepository {
 
     Optional<ChatRoom> findChatRoomBySellerAndBuyer(long sellerUserId, long buyerUserId);
 
+    Optional<ChatRoom> findChatRoomAndChatDataById(long chatRoomId);
 }
