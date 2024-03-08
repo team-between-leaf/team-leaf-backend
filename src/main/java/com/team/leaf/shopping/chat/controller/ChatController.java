@@ -48,7 +48,7 @@ public class ChatController {
     }
 
     @GetMapping("/room/{sellerId}/{buyerId}")
-    @Operation(summary = "구매자와 판매자 아이디로 채팅 데이터 가져오기")
+    @Operation(summary = "구매자와 판매자 아이디로 채팅 데이터 가져오기 [ 없으면 채팅 방 생성 ]")
     public ApiResponse findChatDataBySellerAndBuyer(@PathVariable long sellerId, @PathVariable long buyerId) {
         List<ChatDataResponse> result = chatService.findChatDataBySellerAndBuyer(sellerId, buyerId);
 
