@@ -27,12 +27,13 @@ public class ChatRoom {
     @ManyToOne(fetch = FetchType.LAZY)
     private AccountDetail buyer;
 
-    @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.REMOVE}, orphanRemoval = true)
+    @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.REMOVE}, orphanRemoval = true, mappedBy = "chatRoom")
     @Builder.Default
     private List<Chat> chatData = new LinkedList<>();
 
     public void addChatData(Chat chat) {
         chatData.add(chat);
+        chat.setChatRoom(this);
     }
 
     public static ChatRoom createChatRoom(AccountDetail seller, AccountDetail buyer) {

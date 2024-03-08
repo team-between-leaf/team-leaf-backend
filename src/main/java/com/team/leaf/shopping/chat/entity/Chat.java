@@ -2,10 +2,7 @@ package com.team.leaf.shopping.chat.entity;
 
 import com.team.leaf.user.account.entity.AccountDetail;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
@@ -28,6 +25,10 @@ public class Chat {
 
     @ManyToOne(fetch = FetchType.LAZY)
     private AccountDetail writer;
+
+    @Setter
+    @ManyToOne(fetch = FetchType.LAZY)
+    private ChatRoom chatRoom;
 
     public static Chat createChat(AccountDetail accountDetail, String message) {
         return Chat.builder()

@@ -67,7 +67,8 @@ public class ChatRoomRepositoryImpl implements CustomChatRoomRepository {
                                 ChatDataResponse.class,
                                 chat.message,
                                 chat.writeTime,
-                                accountDetail.nickname
+                                accountDetail.nickname,
+                                accountDetail.userId
                         )
                 )
                 .from(chatRoom)
@@ -86,7 +87,8 @@ public class ChatRoomRepositoryImpl implements CustomChatRoomRepository {
                                 ChatDataResponse.class,
                                 chat.message,
                                 chat.writeTime,
-                                accountDetail.nickname
+                                accountDetail.nickname,
+                                accountDetail.userId
                         )
                 )
                 .from(chatRoom)
