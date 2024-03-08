@@ -82,7 +82,7 @@ public class WebSocketHandler extends TextWebSocketHandler {
     }
 
     private void sendMessage(Set<WebSocketSession> webSocketSessions, ChatMessageRequest body, AccountDetail sender) throws IOException {
-        ChatMessageResponse response = ChatMessageResponse.createChatMessageResponse(body.getMessage(), sender.getNickname());
+        ChatMessageResponse response = ChatMessageResponse.createChatMessageResponse(body.getMessage(), sender);
 
         for(WebSocketSession sessionData : webSocketSessions) {
             sessionData.sendMessage(new TextMessage(mapper.writeValueAsString(response)));

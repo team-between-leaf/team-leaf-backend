@@ -35,4 +35,11 @@ public class ChatRoom {
         chatData.add(chat);
     }
 
+    public static ChatRoom createChatRoom(AccountDetail seller, AccountDetail buyer) {
+        return ChatRoom.builder()
+                .buyer(buyer)
+                .seller(seller)
+                .build();
+    }
+
 }

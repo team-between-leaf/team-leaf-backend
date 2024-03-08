@@ -1,5 +1,6 @@
 package com.team.leaf.shopping.chat.dto;
 
+import com.team.leaf.user.account.entity.AccountDetail;
 import lombok.Builder;
 
 @Builder
@@ -9,10 +10,13 @@ public class ChatMessageResponse {
 
     private String sendNickName;
 
-    public static ChatMessageResponse createChatMessageResponse(String message, String sendNickName) {
+    private long senderId;
+
+    public static ChatMessageResponse createChatMessageResponse(String message, AccountDetail accountDetail) {
         return ChatMessageResponse.builder()
                 .message(message)
-                .sendNickName(sendNickName)
+                .sendNickName(accountDetail.getNickname())
+                .senderId(accountDetail.getUserId())
                 .build();
     }
 
