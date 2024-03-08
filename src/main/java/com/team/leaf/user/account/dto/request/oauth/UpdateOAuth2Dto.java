@@ -1,14 +1,13 @@
-package com.team.leaf.user.account.dto.request;
+package com.team.leaf.user.account.dto.request.oauth;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
 @NoArgsConstructor
-public class UpdateAccountDto {
+public class UpdateOAuth2Dto {
 
     private String email;
-    private String password;
     private String name;
     private String nickname;
     private String phone;

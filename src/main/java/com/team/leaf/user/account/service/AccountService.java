@@ -1,13 +1,14 @@
 package com.team.leaf.user.account.service;
 
 import com.team.leaf.user.account.config.JwtSecurityConfig;
-import com.team.leaf.user.account.dto.request.JoinRequest;
-import com.team.leaf.user.account.dto.request.LoginRequest;
-import com.team.leaf.user.account.dto.request.UpdateAccountDto;
+import com.team.leaf.user.account.dto.request.jwt.JwtJoinRequest;
+import com.team.leaf.user.account.dto.request.jwt.JwtLoginRequest;
+import com.team.leaf.user.account.dto.request.jwt.UpdateJwtAccountDto;
 import com.team.leaf.user.account.dto.response.AccountDto;
 import com.team.leaf.user.account.dto.response.LoginAccountDto;
 import com.team.leaf.user.account.dto.response.TokenDto;
 import com.team.leaf.user.account.entity.AccountDetail;
+import com.team.leaf.user.account.entity.AccountRole;
 import com.team.leaf.user.account.entity.RefreshToken;
 import com.team.leaf.user.account.jwt.JwtTokenUtil;
 import com.team.leaf.user.account.repository.AccountRepository;
@@ -15,7 +16,6 @@ import com.team.leaf.user.account.repository.RefreshTokenRepository;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -27,27 +27,13 @@ import java.util.regex.Pattern;
 public class AccountService {
 
     private final AccountRepository accountRepository;
+    private final CommonService commonService;
     private final RefreshTokenRepository refreshTokenRepository;
     private final JwtTokenUtil jwtTokenUtil;
     private final JwtSecurityConfig jwtSecurityConfig;
 
-    // 전화번호 중복 확인
-    public boolean checkPhoneDuplicate(String phone) {
-        return accountRepository.existsByPhone(phone);
-    }
-
-    private void validateEmail(String email) {
-        String emailRegex = "^[a-zA-Z0-9_+&*-]+(?:\\.[a-zA-Z0-9_+&*-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,7}$";
-        Pattern emailPattern = Pattern.compile(emailRegex);
-        Matcher emailMatcher = emailPattern.matcher(email);
-
-        if (!emailMatcher.matches()) {
-            throw new RuntimeException("이메일 형식이 올바르지 않습니다.");
-        }
-    }
-
     private void validatePassword(String password) {
-        String passwordRegex = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=!])(?=\\S+$).{9,20}$";
+        String passwordRegex = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=!])(?=\\S+$).{9,22}$";
         Pattern pwPattern = Pattern.compile(passwordRegex);
         Matcher pwMatcher = pwPattern.matcher(password);
 
@@ -56,30 +42,21 @@ public class AccountService {
         }
     }
 
-    private void validatePhone(String phone) {
-        String phoneRegex = "^[0-9]{10,11}$";
-        Pattern phonePattern = Pattern.compile(phoneRegex);
-        Matcher phoneMatcher = phonePattern.matcher(phone);
-
-        if(!phoneMatcher.matches()) {
-            throw new RuntimeException("전화번호 형식이 올바르지 않습니다.");
-        }
-    }
-
     @Transactional
-    public String join(JoinRequest request) {
+    public String join(JwtJoinRequest request) {
 
-        validateEmail(request.getEmail());
+        commonService.validateEmail(request.getEmail());
         validatePassword(request.getPassword());
-        validatePhone(request.getPhone());
+        commonService.validatePhone(request.getPhone());
 
         if(!request.getPassword().equals(request.getPasswordCheck())) {
             throw new RuntimeException("비밀번호가 일치하지 않습니다.");
         }
 
-        // 번호 중복 체크
-        if (accountRepository.existsByPhone(request.getPhone())) {
-            throw new RuntimeException("해당 번호로 가입된 계정이 이미 존재합니다.");
+
+        String existingUserMessage = commonService.checkPhoneNumberDuplicate(request.getPhone());
+        if (!"중복된 데이터가 없습니다.".equals(existingUserMessage)) {
+            throw new RuntimeException(existingUserMessage);
         }
 
         // 닉네임 중복 체크
@@ -93,7 +70,7 @@ public class AccountService {
     }
 
     @Transactional
-    public LoginAccountDto login(LoginRequest request, HttpServletResponse response) {
+    public LoginAccountDto login(JwtLoginRequest request, HttpServletResponse response) {
 
         // 이메일로 유저 정보 확인
         AccountDetail accountDetail = accountRepository.findByEmail(request.getEmail()).orElseThrow(() ->
@@ -117,7 +94,7 @@ public class AccountService {
                 refreshTokenRepository.save(newToken);
             }
 
-            setHeader(response, tokenDto);
+            commonService.setHeader(response, tokenDto);
 
             String access_token = tokenDto.getAccessToken();
             String refresh_token = tokenDto.getRefreshToken();
@@ -127,12 +104,12 @@ public class AccountService {
     }
 
     @Transactional
-    public String updateUser(String email, UpdateAccountDto accountDto) {
+    public String updateUser(String email, UpdateJwtAccountDto accountDto) {
         AccountDetail accountDetail = accountRepository.findByEmail(email).orElseThrow(() ->
                 new RuntimeException("사용자를 찾을 수 없습니다."));
 
         if (accountDto.getEmail() != null && !accountDto.getEmail().isEmpty()) {
-            validateEmail(accountDto.getEmail());
+            commonService.validateEmail(accountDto.getEmail());
             accountDetail.setEmail(accountDto.getEmail());
         }
 
@@ -151,7 +128,7 @@ public class AccountService {
         }
 
         if (accountDto.getPhone() != null && !accountDto.getPhone().isEmpty()) {
-            validatePhone(accountDetail.getPhone());
+            commonService.validatePhone(accountDetail.getPhone());
             accountDetail.setPhone(accountDto.getPhone());
         }
 
@@ -186,11 +163,9 @@ public class AccountService {
 
 
     //유저 정보 조회
-    @Transactional
     public AccountDto getAccount(String email) {
         AccountDetail accountDetail = accountRepository.findByEmail(email).orElseThrow(() ->
                 new RuntimeException("사용자를 찾을 수 없습니다."));
-
         return new AccountDto(accountDetail);
     }
 
@@ -201,11 +176,6 @@ public class AccountService {
         refreshTokenRepository.delete(refreshToken);
 
         return "Success Logout";
-    }
-
-    private void setHeader(HttpServletResponse response, TokenDto tokenDto) {
-        response.addHeader(JwtTokenUtil.ACCESS_TOKEN, tokenDto.getAccessToken());
-        response.addHeader(JwtTokenUtil.REFRESH_TOKEN, tokenDto.getRefreshToken());
     }
 
     @Transactional
@@ -232,6 +202,5 @@ public class AccountService {
 
         return newTokenDto;
     }
-
 
 }
