@@ -29,6 +29,10 @@ public class ChatRoom {
 
     @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.REMOVE}, orphanRemoval = true)
     @Builder.Default
-    private List<Chat> ChatData = new LinkedList<>();
+    private List<Chat> chatData = new LinkedList<>();
+
+    public void addChatData(Chat chat) {
+        chatData.add(chat);
+    }
 
 }

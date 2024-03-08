@@ -5,7 +5,7 @@ import com.team.leaf.shopping.chat.dto.ChatRoomResponse;
 
 import java.util.List;
 
-public interface CustomChatRepository {
+public interface CustomChatRoomRepository {
 
     List<ChatRoomResponse> findSellerChatRoomByUserId(long userId);
 

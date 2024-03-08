@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
 
@@ -22,9 +23,17 @@ public class Chat {
 
     private String message;
 
+    @CreationTimestamp
     private LocalDateTime writeTime;
 
     @ManyToOne(fetch = FetchType.LAZY)
     private AccountDetail writer;
+
+    public static Chat createChat(AccountDetail accountDetail, String message) {
+        return Chat.builder()
+                .message(message)
+                .writer(accountDetail)
+                .build();
+    }
 
 }

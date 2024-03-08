@@ -14,7 +14,7 @@ import static com.team.leaf.shopping.chat.entity.QChatRoom.chatRoom;
 import java.util.List;
 
 @RequiredArgsConstructor
-public class ChatRepositoryImpl implements CustomChatRepository {
+public class ChatRoomRepositoryImpl implements CustomChatRoomRepository {
 
     private final JPAQueryFactory jpaQueryFactory;
 

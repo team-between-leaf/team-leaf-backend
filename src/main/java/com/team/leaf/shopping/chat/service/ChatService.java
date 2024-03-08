@@ -2,7 +2,7 @@ package com.team.leaf.shopping.chat.service;
 
 import com.team.leaf.shopping.chat.dto.ChatDataResponse;
 import com.team.leaf.shopping.chat.dto.ChatRoomResponse;
-import com.team.leaf.shopping.chat.repository.ChatRepository;
+import com.team.leaf.shopping.chat.repository.ChatRoomRepository;
 import com.team.leaf.user.account.entity.AccountDetail;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -13,7 +13,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ChatService {
 
-    private final ChatRepository chatRepository;
+    private final ChatRoomRepository chatRepository;
 
     public List<ChatRoomResponse> findSellerChatRoomByUserId(AccountDetail accountDetail) {
         return chatRepository.findSellerChatRoomByUserId(accountDetail.getUserId());
