@@ -7,7 +7,7 @@ import lombok.Getter;
 @Getter
 public class UtilInitDto {
 
-    private String value;
+    private String word;
     private int frequency;
 
 }

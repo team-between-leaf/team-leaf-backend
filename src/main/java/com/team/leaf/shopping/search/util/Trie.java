@@ -1,25 +1,41 @@
 package com.team.leaf.shopping.search.util;
 
 import com.team.leaf.shopping.search.dto.UtilInitDto;
+import com.team.leaf.shopping.search.entity.AutoComplete;
+import com.team.leaf.shopping.search.repository.AutoCompleteRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 
 class Node {
     Map<Character, Node> childedNode = new HashMap<>();
-    String value = "";
-    boolean isContainWord = false;
-    int frequency = 0;
+    String word;
+    boolean isContainWord;
+    int frequency;
 
-    public Node(char value) {
-        this.value = String.valueOf(value);
+    public Node(char word) {
+        this.word = String.valueOf(word);
+        this.isContainWord = false;
+        this.frequency = 0;
+    }
+
+    public Node(AutoComplete autoComplete) {
+        word = autoComplete.getWord();
+        frequency = autoComplete.getFrequency();
+        isContainWord = true;
     }
 }
 
+@Component
+@RequiredArgsConstructor
 public class Trie {
 
     Node rootNode = new Node('E');
+    private final AutoCompleteRepository autoCompleteRepository;
 
+    @Transactional
     public Node insert(String str) {
         Node node = this.rootNode;
 
@@ -27,10 +43,18 @@ public class Trie {
             node = node.childedNode.computeIfAbsent(str.charAt(i), key -> new Node(key));
         }
 
-        node.isContainWord = true;
-        node.frequency += 1;
+        Node currentNode = createOrLoadAutoComplete(node.word);
+        currentNode.isContainWord = true;
+        currentNode.frequency += 1;
 
-        return node;
+        return currentNode;
+    }
+
+    protected Node createOrLoadAutoComplete(String word) {
+        AutoComplete autoComplete = autoCompleteRepository.findAutoCompleteByWord(word)
+                .orElseGet(() -> autoCompleteRepository.save(AutoComplete.createAutoComplete(word)));
+
+        return new Node(autoComplete);
     }
 
     public List<UtilInitDto> searchComplete(String searchWord) {
@@ -47,7 +71,7 @@ public class Trie {
             Node currentNode = queue.poll();
 
             if(currentNode.isContainWord) {
-                result.add(new UtilInitDto(currentNode.value, currentNode.frequency));
+                result.add(new UtilInitDto(currentNode.word, currentNode.frequency));
             }
 
             for(char ch : currentNode.childedNode.keySet()) {

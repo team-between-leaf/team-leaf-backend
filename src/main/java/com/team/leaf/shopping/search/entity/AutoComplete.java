@@ -19,6 +19,15 @@ public class AutoComplete {
     @GeneratedValue
     private long autoCompleteId;
 
+    private String word;
 
+    private int frequency;
+
+    public static AutoComplete createAutoComplete(String word) {
+        return AutoComplete.builder()
+                .word(word)
+                .frequency(0)
+                .build();
+    }
 
 }
