@@ -101,6 +101,17 @@ public class Trie {
             }
         }
 
+        Collections.sort(result, new Comparator<UtilInitDto>() {
+            @Override
+            public int compare(UtilInitDto o1, UtilInitDto o2) {
+                return o2.getFrequency() - o1.getFrequency();
+            }
+        });
+
+        if(result.size() > 10) {
+            result.subList(10, result.size()).clear();
+        }
+
         return result;
     }
 
