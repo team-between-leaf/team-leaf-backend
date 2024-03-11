@@ -39,7 +39,7 @@ public class AccountController {
         return new ApiResponse<>(accountService.join(joinRequest));
     }
 
-    @PostMapping("/join/additionalInfo")
+    @PostMapping("/join/additional-info")
     @Operation(summary = "[웹 전용] 회원가입 추가 정보 입력 API")
     public ApiResponse<String> joinWithAdditionalInfo(@RequestBody AdditionalJoinInfoRequest request) throws IOException {
         String responseMessage = accountService.joinWithAdditionalInfo(request);
