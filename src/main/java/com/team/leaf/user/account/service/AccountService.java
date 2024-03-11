@@ -1,23 +1,25 @@
 package com.team.leaf.user.account.service;
 
 import com.team.leaf.user.account.config.JwtSecurityConfig;
+import com.team.leaf.user.account.dto.request.jwt.AdditionalJoinInfoRequest;
 import com.team.leaf.user.account.dto.request.jwt.JwtJoinRequest;
 import com.team.leaf.user.account.dto.request.jwt.JwtLoginRequest;
 import com.team.leaf.user.account.dto.request.jwt.UpdateJwtAccountDto;
 import com.team.leaf.user.account.dto.response.AccountDto;
 import com.team.leaf.user.account.dto.response.LoginAccountDto;
 import com.team.leaf.user.account.dto.response.TokenDto;
-import com.team.leaf.user.account.entity.AccountDetail;
-import com.team.leaf.user.account.entity.AccountRole;
-import com.team.leaf.user.account.entity.RefreshToken;
+import com.team.leaf.user.account.entity.*;
 import com.team.leaf.user.account.jwt.JwtTokenUtil;
 import com.team.leaf.user.account.repository.AccountRepository;
+import com.team.leaf.user.account.repository.InterestCategoryRepository;
 import com.team.leaf.user.account.repository.RefreshTokenRepository;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -29,6 +31,7 @@ public class AccountService {
     private final AccountRepository accountRepository;
     private final CommonService commonService;
     private final RefreshTokenRepository refreshTokenRepository;
+    private final InterestCategoryRepository interestCategoryRepository;
     private final JwtTokenUtil jwtTokenUtil;
     private final JwtSecurityConfig jwtSecurityConfig;
 
@@ -53,10 +56,14 @@ public class AccountService {
             throw new RuntimeException("비밀번호가 일치하지 않습니다.");
         }
 
+        String existingPhone = commonService.checkPhoneNumberDuplicate(request.getPhone());
+        if (!"중복된 데이터가 없습니다.".equals(existingPhone)) {
+            throw new RuntimeException(existingPhone);
+        }
 
-        String existingUserMessage = commonService.checkPhoneNumberDuplicate(request.getPhone());
-        if (!"중복된 데이터가 없습니다.".equals(existingUserMessage)) {
-            throw new RuntimeException(existingUserMessage);
+        String existingEmail = commonService.checkEmailDuplicate(request.getEmail());
+        if (!"중복된 데이터가 없습니다.".equals(existingEmail)) {
+            throw new RuntimeException(existingEmail);
         }
 
         // 닉네임 중복 체크
@@ -67,6 +74,50 @@ public class AccountService {
         AccountDetail accountDetail = AccountDetail.joinAccount(request.getEmail(),jwtSecurityConfig.passwordEncoder().encode(request.getPassword()), request.getPhone(), request.getNickname());
         accountRepository.save(accountDetail);
         return "Success Join";
+
+    }
+
+    public String joinWithAdditionalInfo(AdditionalJoinInfoRequest request) {
+
+        AccountDetail accountDetail = accountRepository.findByEmail(request.getEmail())
+                .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
+
+        accountDetail.updateAdditionalInfo(request.getName(), request.getBirthday(), request.getGender(), request.getUniversityName());
+
+        List<String> selectedCategories = request.getInterestCategories();
+
+        // InterestCategory 객체 생성 및 카테고리 값 설정
+        InterestCategory interestCategory = new InterestCategory();
+        for (int i = 0; i < selectedCategories.size() && i < 5; i++) {
+            switch (i) {
+                case 0:
+                    interestCategory.setCategory1(selectedCategories.get(i));
+                    break;
+                case 1:
+                    interestCategory.setCategory2(selectedCategories.get(i));
+                    break;
+                case 2:
+                    interestCategory.setCategory3(selectedCategories.get(i));
+                    break;
+                case 3:
+                    interestCategory.setCategory4(selectedCategories.get(i));
+                    break;
+                case 4:
+                    interestCategory.setCategory5(selectedCategories.get(i));
+                    break;
+            }
+        }
+
+        // InterestCategory를 저장
+        interestCategoryRepository.save(interestCategory);
+
+        // AccountInterest를 생성하고 저장
+        AccountInterest accountInterest = new AccountInterest(accountDetail, interestCategory);
+        accountDetail.getInterestList().add(accountInterest);
+        accountRepository.save(accountDetail);
+
+        return "Success";
+
     }
 
     @Transactional

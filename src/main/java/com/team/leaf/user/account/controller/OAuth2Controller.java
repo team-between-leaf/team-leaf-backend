@@ -1,5 +1,7 @@
 package com.team.leaf.user.account.controller;
 
+import com.team.leaf.user.account.dto.common.DuplicatePhoneRequest;
+import com.team.leaf.user.account.dto.common.LogoutRequest;
 import com.team.leaf.user.account.dto.request.oauth.OAuth2JoinRequest;
 import com.team.leaf.user.account.dto.request.oauth.OAuth2LoginRequest;
 import com.team.leaf.user.account.dto.response.LoginAccountDto;
@@ -36,18 +38,18 @@ public class OAuth2Controller {
         return new ApiResponse<>(oAuth2Service.login(loginRequest, response));
     }
 
-    @DeleteMapping("/logout/{userEmail}")
-    @Operation(summary= "소셜 로그인 로그아웃 API")
-    public ApiResponse<String> logout(@PathVariable String userEmail) {
+    @DeleteMapping("/logout")
+    @Operation(summary = "소셜 로그인 로그아웃 API")
+    public ApiResponse<String> logout(@RequestBody LogoutRequest logoutRequest) {
+        String userEmail = logoutRequest.getEmail();
         return new ApiResponse<>(oAuth2Service.logout(userEmail));
     }
 
-    @PostMapping("/check/{phone}")
-    @Operation(summary= "중복 회원 확인 API")
-    public ResponseEntity<String> checkPhoneDuplicate(@PathVariable String phone) {
-        String existingUserMessage = commonService.checkPhoneNumberDuplicate(phone);
+    @PostMapping("/check/phone")
+    @Operation(summary = "중복 회원 확인 API")
+    public ResponseEntity<String> checkPhoneDuplicate(@RequestBody DuplicatePhoneRequest phoneRequest) {
+        String existingUserMessage = commonService.checkPhoneNumberDuplicate(phoneRequest.getPhone());
 
-        // 해당 번호로 가입된 계정이 존재하는 경우
         if (!"중복된 데이터가 없습니다.".equals(existingUserMessage)) {
             return ResponseEntity.badRequest().body(existingUserMessage);
         }

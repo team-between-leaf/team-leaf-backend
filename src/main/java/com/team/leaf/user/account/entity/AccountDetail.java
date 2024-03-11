@@ -7,6 +7,10 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 import static com.team.leaf.user.account.entity.AccountPrivacy.createAccountPrivacy;
 
@@ -34,6 +38,8 @@ public class AccountDetail {
 
     private String birthyear;
 
+    private String gender;
+
     private String universityName;
 
     private String shippingAddress;
@@ -56,6 +62,9 @@ public class AccountDetail {
 
     @OneToOne(cascade = {CascadeType.PERSIST, CascadeType.REMOVE}, orphanRemoval = true, fetch = FetchType.LAZY)
     private AccountPrivacy userDetail;
+
+    @OneToMany(mappedBy = "accountDetail", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<AccountInterest> interestList = new ArrayList<>();
 
     public static AccountDetail joinAccount(String email, String encodedPassword, String phone, String nickname) {
         AccountDetail accountDetail = new AccountDetail();
@@ -84,6 +93,13 @@ public class AccountDetail {
         this.shippingAddress = shippingAddress;
         this.schoolAddress = schoolAddress;
         this.workAddress = workAddress;
+    }
+
+    public void updateAdditionalInfo(String name, String birthday, String gender, String universityName) {
+        this.name = name;
+        this.birthday = birthday;
+        this.gender = gender;
+        this.universityName = universityName;
     }
 
 }
