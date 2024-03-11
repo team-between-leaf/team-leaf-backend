@@ -30,4 +30,7 @@ public class AutoComplete {
                 .build();
     }
 
+    public void increaseFrequency(int i) {
+        this.frequency += i;
+    }
 }
