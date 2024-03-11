@@ -18,6 +18,7 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.regex.Matcher;
@@ -81,10 +82,7 @@ public class AccountService {
         AccountDetail accountDetail = accountRepository.findByEmail(request.getEmail())
                 .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
 
-        accountDetail.setName(request.getName());
-        accountDetail.setBirthday(request.getBirthday());
-        accountDetail.setGender(request.getGender());
-        accountDetail.setUniversityName(request.getUniversityName());
+        accountDetail.updateAdditionalInfo(request.getName(), request.getBirthday(), request.getGender(), request.getUniversityName());
 
         List<String> selectedCategories = request.getInterestCategories();
 
