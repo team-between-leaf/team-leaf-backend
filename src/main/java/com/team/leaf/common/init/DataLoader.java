@@ -6,6 +6,7 @@ import com.team.leaf.shopping.product.product.entity.Product;
 import com.team.leaf.shopping.product.product.entity.ProductOption;
 import com.team.leaf.shopping.product.product.repository.ProductRepository;
 import com.team.leaf.shopping.product.review.entity.Review;
+import com.team.leaf.shopping.search.util.Trie;
 import com.team.leaf.shopping.wish.entity.Wish;
 import com.team.leaf.shopping.wish.repository.WishRepository;
 import com.team.leaf.user.account.config.JwtSecurityConfig;
@@ -28,10 +29,14 @@ public class DataLoader implements CommandLineRunner {
     private final WishRepository wishRepository;
     private final JwtSecurityConfig jwtSecurityConfig;
     private final FollowRepository followRepository;
+    private final Trie trie;
 
     @Override
     @Transactional
     public void run(String... args) {
+        // 트라이 초기 데이터 정렬
+        trie.initTrie();
+
         // 초기 데이터 저장
         // Account
         AccountDetail accountDetail1 = accountRepository.findByEmail("hchaehyun@naver.com")
