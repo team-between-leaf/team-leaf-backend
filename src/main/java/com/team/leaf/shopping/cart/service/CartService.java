@@ -83,4 +83,18 @@ public class CartService {
         }
         return cartProductCouponResponseList;
     }
+
+//    @Transactional
+//    public CartResponse updateCartOption(){
+//    }
+
+    @Transactional
+    public String deleteCart(List<Long> productIds, AccountDetail accountDetail){
+        for(Long productId : productIds){
+            Product product = productRepository.findById(productId)
+                    .orElseThrow(() -> new RuntimeException("Not Found Product"));
+            cartRepository.deleteByProductAndUser(product,accountDetail);
+        }
+        return "Delete Success";
+    }
 }

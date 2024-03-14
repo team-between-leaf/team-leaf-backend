@@ -8,11 +8,10 @@ import com.team.leaf.user.account.exception.ApiResponseStatus;
 import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Parameter;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import io.swagger.v3.oas.annotations.Operation;
+
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -31,6 +30,16 @@ public class CartController {
     @GetMapping("/cart")
     public ApiResponse getCart(@LogIn AccountDetail accountDetail){
         return new ApiResponse(cartService.getCart(accountDetail));
+    }
+
+//    @PatchMapping("/cart/{productId}")
+//    public ApiResponse updateCart(@PathVariable long productId, @LogIn AccountDetail accountDetail){
+//        return new ApiResponse(cartService)
+//    }
+
+    @DeleteMapping("/cart")
+    public ApiResponse deleteCart(@RequestParam("productId") List<Long> productIds, @LogIn AccountDetail accountDetail){
+        return new ApiResponse(cartService.deleteCart(productIds, accountDetail));
     }
 
 }
