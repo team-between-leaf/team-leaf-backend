@@ -1,5 +1,6 @@
 package com.team.leaf.user.account.service;
 
+import com.team.leaf.user.account.dto.request.oauth.OAuth2LoginType;
 import com.team.leaf.user.account.dto.response.TokenDto;
 import com.team.leaf.user.account.entity.AccountDetail;
 import com.team.leaf.user.account.entity.OAuth2Account;
@@ -46,7 +47,7 @@ public class CommonService {
         AccountDetail accountDetail = accountRepository.findByPhone(phone);
 
         if (oAuth2Account != null) {
-            String socialType = oAuth2Account.getSocialType();
+            OAuth2LoginType socialType = oAuth2Account.getSocialType();
             return socialType + "로그인으로 가입된 계정이 존재합니다.";
         }
 
@@ -64,7 +65,7 @@ public class CommonService {
 
         if (oAuth2AccountOptional.isPresent()) {
             OAuth2Account oAuth2Account = oAuth2AccountOptional.get();
-            String socialType = oAuth2Account.getSocialType();
+            OAuth2LoginType socialType = oAuth2Account.getSocialType();
             return socialType + "로그인으로 가입된 계정이 존재합니다.";
         }
 

@@ -13,7 +13,7 @@ import com.team.leaf.shopping.product.review.entity.Review;
 import com.team.leaf.shopping.search.util.Trie;
 import com.team.leaf.shopping.wish.entity.Wish;
 import com.team.leaf.shopping.wish.repository.WishRepository;
-import com.team.leaf.user.account.config.JwtSecurityConfig;
+import com.team.leaf.user.account.config.SecurityConfig;
 import com.team.leaf.user.account.entity.AccountDetail;
 import com.team.leaf.user.account.repository.AccountRepository;
 import jakarta.transaction.Transactional;
@@ -33,7 +33,7 @@ public class DataLoader implements CommandLineRunner {
     private final WishRepository wishRepository;
     private final CartRepository cartRepository;
     private final CouponRepository couponRepository;
-    private final JwtSecurityConfig jwtSecurityConfig;
+    private final SecurityConfig jwtSecurityConfig;
     private final FollowRepository followRepository;
     private final Trie trie;
 
