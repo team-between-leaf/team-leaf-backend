@@ -8,9 +8,7 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import static com.team.leaf.user.account.entity.AccountPrivacy.createAccountPrivacy;
 
@@ -64,7 +62,7 @@ public class AccountDetail {
     private AccountPrivacy userDetail;
 
     @OneToMany(mappedBy = "accountDetail", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<AccountInterest> interestList = new ArrayList<>();
+    private List<AccountInterest> accountInterests = new ArrayList<>();
 
     public static AccountDetail joinAccount(String email, String encodedPassword, String phone, String nickname) {
         AccountDetail accountDetail = new AccountDetail();
