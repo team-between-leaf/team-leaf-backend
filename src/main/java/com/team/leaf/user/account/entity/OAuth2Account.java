@@ -1,10 +1,10 @@
 package com.team.leaf.user.account.entity;
 
+import com.team.leaf.user.account.dto.request.oauth.OAuth2LoginType;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDate;
-import java.util.List;
 
 import static com.team.leaf.user.account.entity.AccountPrivacy.createAccountPrivacy;
 
@@ -41,8 +41,6 @@ public class OAuth2Account {
 
     private String workAddress;
 
-    private String socialType;
-
     private LocalDate joinDate;
 
     private LocalDate lastAccess;
@@ -53,34 +51,24 @@ public class OAuth2Account {
     @Column(nullable = false)
     private AccountRole role;
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private OAuth2LoginType socialType;
+
     @OneToOne(cascade = {CascadeType.PERSIST, CascadeType.REMOVE}, orphanRemoval = true, fetch = FetchType.LAZY)
     private AccountPrivacy userDetail;
 
-    public String getSocialType() {
+    /*public String getSocialType() {
         return socialType;
-    }
+    }*/
 
-    public static OAuth2Account joinNaverKakao(String email, String name, String nickname, String phone, String birthday, String socialType) {
+    public static OAuth2Account login(String email, String name, String nickname, String phone, String birthday, OAuth2LoginType socialType) {
         OAuth2Account oAuth2Account = new OAuth2Account();
         oAuth2Account.email = email;
         oAuth2Account.name = name;
         oAuth2Account.phone = phone;
         oAuth2Account.nickname = nickname;
         oAuth2Account.birthday = birthday;
-        oAuth2Account.socialType = socialType;
-        oAuth2Account.role = AccountRole.USER;
-        oAuth2Account.joinDate = LocalDate.now();
-        oAuth2Account.userDetail = createAccountPrivacy();
-
-        return oAuth2Account;
-    }
-
-    public static OAuth2Account joinGoogle(String email, String name, String nickname, String phone, String socialType) {
-        OAuth2Account oAuth2Account = new OAuth2Account();
-        oAuth2Account.email = email;
-        oAuth2Account.name = name;
-        oAuth2Account.phone = phone;
-        oAuth2Account.nickname = nickname;
         oAuth2Account.socialType = socialType;
         oAuth2Account.role = AccountRole.USER;
         oAuth2Account.joinDate = LocalDate.now();
