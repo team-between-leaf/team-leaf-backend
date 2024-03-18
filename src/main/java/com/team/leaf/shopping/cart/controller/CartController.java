@@ -8,6 +8,7 @@ import com.team.leaf.user.account.exception.ApiResponseStatus;
 import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Parameter;
 import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -25,6 +26,11 @@ public class CartController {
         cartService.addProductToCart(productId, accountDetail);
 
         return new ApiResponse(ApiResponseStatus.SUCCESS);
+    }
+
+    @GetMapping("/cart")
+    public ApiResponse getCart(@LogIn AccountDetail accountDetail){
+        return new ApiResponse(cartService.getCart(accountDetail));
     }
 
 }

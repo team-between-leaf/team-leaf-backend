@@ -10,6 +10,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -55,6 +56,25 @@ public class CommonService {
 
         return "중복된 데이터가 없습니다.";
     }
+
+    public String checkEmailDuplicate(String email) {
+        Optional<OAuth2Account> oAuth2AccountOptional = oAuth2Repository.findByEmail(email);
+        Optional<AccountDetail> accountDetailOptional = accountRepository.findByEmail(email);
+
+
+        if (oAuth2AccountOptional.isPresent()) {
+            OAuth2Account oAuth2Account = oAuth2AccountOptional.get();
+            String socialType = oAuth2Account.getSocialType();
+            return socialType + "로그인으로 가입된 계정이 존재합니다.";
+        }
+
+        if (accountDetailOptional.isPresent()) {
+            return "일반 로그인으로 가입된 계정이 존재합니다.";
+        }
+
+        return "중복된 데이터가 없습니다.";
+    }
+
     public void setHeader(HttpServletResponse response, TokenDto tokenDto) {
         response.addHeader(JwtTokenUtil.ACCESS_TOKEN, tokenDto.getAccessToken());
         response.addHeader(JwtTokenUtil.REFRESH_TOKEN, tokenDto.getRefreshToken());

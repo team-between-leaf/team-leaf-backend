@@ -1,5 +1,9 @@
 package com.team.leaf.user.account.controller;
 
+import com.team.leaf.user.account.dto.common.DuplicateEmailRequest;
+import com.team.leaf.user.account.dto.common.DuplicatePhoneRequest;
+import com.team.leaf.user.account.dto.common.LogoutRequest;
+import com.team.leaf.user.account.dto.request.jwt.AdditionalJoinInfoRequest;
 import com.team.leaf.user.account.dto.request.jwt.JwtJoinRequest;
 import com.team.leaf.user.account.dto.request.jwt.JwtLoginRequest;
 import com.team.leaf.user.account.dto.response.AccountDto;
@@ -35,15 +39,23 @@ public class AccountController {
         return new ApiResponse<>(accountService.join(joinRequest));
     }
 
+    @PostMapping("/join/additional-info")
+    @Operation(summary = "[웹 전용] 회원가입 추가 정보 입력 API")
+    public ApiResponse<String> joinWithAdditionalInfo(@RequestBody AdditionalJoinInfoRequest request) throws IOException {
+        String responseMessage = accountService.joinWithAdditionalInfo(request);
+        return new ApiResponse<>(responseMessage);
+    }
+
     @PostMapping("/login")
     @Operation(summary= "자체 로그인 로그인 API")
     public ApiResponse<LoginAccountDto> login(@RequestBody @Valid JwtLoginRequest loginRequest, HttpServletResponse response) {
         return new ApiResponse<>(accountService.login(loginRequest, response));
     }
 
-    @DeleteMapping("/logout/{userEmail}")
-    @Operation(summary= "자체 로그인 로그아웃 API")
-    public ApiResponse<String> logout(@PathVariable String userEmail) {
+    @DeleteMapping("/logout")
+    @Operation(summary = "자체 로그인 로그아웃 API")
+    public ApiResponse<String> logout(@RequestBody LogoutRequest logoutRequest) {
+        String userEmail = logoutRequest.getEmail();
         return new ApiResponse<>(accountService.logout(userEmail));
     }
 
@@ -63,18 +75,22 @@ public class AccountController {
         }
     }
 
-    @GetMapping("/{userEmail}")
-    @Operation(summary= "중복 이메일 확인 API")
-    public ResponseEntity findAccountById(@PathVariable String userEmail) {
-        AccountDto account = accountService.getAccount(userEmail);
+    @PostMapping("/email")
+    @Operation(summary = "중복 이메일 확인 API")
+    public ResponseEntity<String> findAccountById(@RequestBody DuplicateEmailRequest emailRequest) {
+        String existingUserMessage = commonService.checkEmailDuplicate(emailRequest.getEmail());
 
-        return ResponseEntity.ok(account);
+        if (!"중복된 데이터가 없습니다.".equals(existingUserMessage)) {
+            return ResponseEntity.badRequest().body(existingUserMessage);
+        }
+
+        return ResponseEntity.ok("중복된 데이터가 없습니다.");
     }
 
-    @PostMapping("/check/{phone}")
-    @Operation(summary= "중복 회원 확인 API")
-    public ResponseEntity<String> checkPhoneDuplicate(@PathVariable String phone) {
-        String existingUserMessage = commonService.checkPhoneNumberDuplicate(phone);
+    @PostMapping("/check/phone")
+    @Operation(summary = "중복 회원 확인 API")
+    public ResponseEntity<String> checkPhoneDuplicate(@RequestBody DuplicatePhoneRequest phoneRequest) {
+        String existingUserMessage = commonService.checkPhoneNumberDuplicate(phoneRequest.getPhone());
 
         if (!"중복된 데이터가 없습니다.".equals(existingUserMessage)) {
             return ResponseEntity.badRequest().body(existingUserMessage);

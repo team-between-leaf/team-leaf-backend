@@ -33,9 +33,14 @@ public class OAuth2Service {
         commonService.validateEmail(request.getEmail());
         commonService.validatePhone(request.getPhone());
 
-        String existingUserMessage = commonService.checkPhoneNumberDuplicate(request.getPhone());
-        if (!"중복된 데이터가 없습니다.".equals(existingUserMessage)) {
-            throw new RuntimeException(existingUserMessage);
+        String existingPhone = commonService.checkPhoneNumberDuplicate(request.getPhone());
+        if (!"중복된 데이터가 없습니다.".equals(existingPhone)) {
+            throw new RuntimeException(existingPhone);
+        }
+
+        String existingEmail = commonService.checkEmailDuplicate(request.getEmail());
+        if (!"중복된 데이터가 없습니다.".equals(existingEmail)) {
+            throw new RuntimeException(existingEmail);
         }
 
         if (oAuth2Repository.existsByNickname(request.getNickname())) {

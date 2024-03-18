@@ -1,5 +1,9 @@
 package com.team.leaf.common.init;
 
+import com.team.leaf.shopping.cart.entity.Cart;
+import com.team.leaf.shopping.cart.repository.CartRepository;
+import com.team.leaf.shopping.coupon.entity.Coupon;
+import com.team.leaf.shopping.coupon.repository.CouponRepository;
 import com.team.leaf.shopping.follow.entity.Follow;
 import com.team.leaf.shopping.follow.repository.FollowRepository;
 import com.team.leaf.shopping.product.product.entity.Product;
@@ -27,6 +31,8 @@ public class DataLoader implements CommandLineRunner {
     private final ProductRepository productRepository;
     private final AccountRepository accountRepository;
     private final WishRepository wishRepository;
+    private final CartRepository cartRepository;
+    private final CouponRepository couponRepository;
     private final JwtSecurityConfig jwtSecurityConfig;
     private final FollowRepository followRepository;
     private final Trie trie;
@@ -115,8 +121,24 @@ public class DataLoader implements CommandLineRunner {
         Wish wish7 = Wish.builder().product(product6).user(accountDetail2).build();
         Wish wish8 = Wish.builder().product(product10).user(accountDetail2).build();
 
+        //Cart
+        Cart cart1 = Cart.builder().user(accountDetail1).product(product1).amount(1).build();
+        Cart cart2 = Cart.builder().user(accountDetail1).product(product2).amount(2).build();
+        Cart cart3 = Cart.builder().user(accountDetail2).product(product3).amount(3).build();
+
+        //Coupon
+        Coupon coupon1 = Coupon.builder().couponName("1번 쿠폰").saleRate(11).product(product1).build();
+        Coupon coupon2 = Coupon.builder().couponName("2번 쿠폰").saleRate(22).product(product1).build();
+        Coupon coupon3 = Coupon.builder().couponName("3번 쿠폰").saleRate(33).product(product2).build();
+
+        //AccountDetail.ShippingAddress
+        accountDetail1.setShippingAddress("충북 충주시 A아파트");
+
         productRepository.saveAll(Arrays.asList(product1, product2, product3, product4, product5, product6, product7, product8, product9, product10));
         wishRepository.saveAll(Arrays.asList(wish1, wish2, wish3, wish4, wish5, wish6, wish7, wish8));
         followRepository.saveAll(Arrays.asList(follow1, follow2, follow3, follow4));
+        cartRepository.saveAll(Arrays.asList(cart1, cart2, cart3));
+        couponRepository.saveAll(Arrays.asList(coupon1, coupon2, coupon3));
+
     }
 }
