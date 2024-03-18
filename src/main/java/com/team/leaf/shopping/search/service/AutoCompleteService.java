@@ -20,7 +20,7 @@ public class AutoCompleteService {
         trie.insert(request.getWord());
     }
 
-    public List<UtilInitDto> findSearchComplete(AutoCompleteRequest request) {
-        return trie.searchComplete(request.getWord());
+    public List<UtilInitDto> findSearchComplete(String word) {
+        return trie.searchComplete(word);
     }
 }
