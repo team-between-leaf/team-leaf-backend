@@ -6,6 +6,7 @@ import com.team.leaf.shopping.search.service.AutoCompleteService;
 import com.team.leaf.user.account.exception.ApiResponse;
 import com.team.leaf.user.account.exception.ApiResponseStatus;
 import io.swagger.v3.oas.annotations.Operation;
+import jakarta.websocket.server.PathParam;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -28,8 +29,8 @@ public class AutoCompleteController {
 
     @GetMapping
     @Operation(summary = "빈도수를 기반으로 자동 검색 탐색")
-    public ApiResponse findSearchComplete(@RequestBody AutoCompleteRequest request) {
-        List<UtilInitDto> result = autoCompleteService.findSearchComplete(request);
+    public ApiResponse findSearchComplete(@RequestParam String word) {
+        List<UtilInitDto> result = autoCompleteService.findSearchComplete(word);
 
         return new ApiResponse(result);
     }
