@@ -1,11 +1,10 @@
 package com.team.leaf.user.account.service;
 
-import com.team.leaf.user.account.config.JwtSecurityConfig;
+import com.team.leaf.user.account.config.SecurityConfig;
 import com.team.leaf.user.account.dto.request.jwt.AdditionalJoinInfoRequest;
 import com.team.leaf.user.account.dto.request.jwt.JwtJoinRequest;
 import com.team.leaf.user.account.dto.request.jwt.JwtLoginRequest;
 import com.team.leaf.user.account.dto.request.jwt.UpdateJwtAccountDto;
-import com.team.leaf.user.account.dto.response.AccountDto;
 import com.team.leaf.user.account.dto.response.LoginAccountDto;
 import com.team.leaf.user.account.dto.response.TokenDto;
 import com.team.leaf.user.account.entity.*;
@@ -16,11 +15,12 @@ import com.team.leaf.user.account.repository.RefreshTokenRepository;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.util.ObjectUtils;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -33,7 +33,8 @@ public class AccountService {
     private final RefreshTokenRepository refreshTokenRepository;
     private final InterestCategoryRepository interestCategoryRepository;
     private final JwtTokenUtil jwtTokenUtil;
-    private final JwtSecurityConfig jwtSecurityConfig;
+    private final SecurityConfig jwtSecurityConfig;
+    private final RedisTemplate redisTemplate;
 
     private void validatePassword(String password) {
         String passwordRegex = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=!])(?=\\S+$).{9,22}$";
@@ -86,34 +87,16 @@ public class AccountService {
 
         List<String> selectedCategories = request.getInterestCategories();
 
-        // InterestCategory 객체 생성 및 카테고리 값 설정
-        InterestCategory interestCategory = new InterestCategory();
-        for (int i = 0; i < selectedCategories.size() && i < 5; i++) {
-            switch (i) {
-                case 0:
-                    interestCategory.setCategory1(selectedCategories.get(i));
-                    break;
-                case 1:
-                    interestCategory.setCategory2(selectedCategories.get(i));
-                    break;
-                case 2:
-                    interestCategory.setCategory3(selectedCategories.get(i));
-                    break;
-                case 3:
-                    interestCategory.setCategory4(selectedCategories.get(i));
-                    break;
-                case 4:
-                    interestCategory.setCategory5(selectedCategories.get(i));
-                    break;
-            }
+        for(String selectedCategory : selectedCategories) {
+            InterestCategory interestCategory = new InterestCategory();
+            interestCategory.setCategory(selectedCategory);
+
+            interestCategory = interestCategoryRepository.save(interestCategory);
+
+            AccountInterest accountInterest = new AccountInterest(accountDetail, interestCategory);
+            accountDetail.getAccountInterests().add(accountInterest);
         }
 
-        // InterestCategory를 저장
-        interestCategoryRepository.save(interestCategory);
-
-        // AccountInterest를 생성하고 저장
-        AccountInterest accountInterest = new AccountInterest(accountDetail, interestCategory);
-        accountDetail.getInterestList().add(accountInterest);
         accountRepository.save(accountDetail);
 
         return "Success";
@@ -133,17 +116,9 @@ public class AccountService {
         }
 
         else {
-            TokenDto tokenDto = jwtTokenUtil.createAllToken(request.getEmail());
+            TokenDto tokenDto = jwtTokenUtil.createToken(request.getEmail());
 
-            Optional<RefreshToken> refreshToken = refreshTokenRepository.findByUserEmail(request.getEmail());
-
-            if(refreshToken.isPresent()) {
-                refreshTokenRepository.save(refreshToken.get().updateToken(tokenDto.getRefreshToken()));
-            }
-            else {
-                RefreshToken newToken = new RefreshToken(tokenDto.getRefreshToken(), request.getEmail());
-                refreshTokenRepository.save(newToken);
-            }
+            redisTemplate.opsForValue().set("RT:" + request.getEmail(), tokenDto.getRefreshToken(), tokenDto.getRefreshTokenExpirationTime(), TimeUnit.MILLISECONDS);
 
             commonService.setHeader(response, tokenDto);
 
@@ -212,46 +187,48 @@ public class AccountService {
         return "Success updateUser";
     }
 
-
-    //유저 정보 조회
-    public AccountDto getAccount(String email) {
-        AccountDetail accountDetail = accountRepository.findByEmail(email).orElseThrow(() ->
-                new RuntimeException("사용자를 찾을 수 없습니다."));
-        return new AccountDto(accountDetail);
-    }
-
     @Transactional
-    public String logout(String email) {
-        RefreshToken refreshToken = refreshTokenRepository.findByUserEmail(email).orElseThrow(() ->
-                new RuntimeException("로그인 되어 있지 않은 사용자입니다."));
-        refreshTokenRepository.delete(refreshToken);
+    public String logout(String accessToken) {
+        if(!jwtTokenUtil.tokenValidataion(accessToken)) {
+            throw new IllegalArgumentException("Invalid Access Token");
+        }
+
+        String email = jwtTokenUtil.getEmailFromToken(accessToken);
+
+        if (redisTemplate.opsForValue().get("RT:" + email) != null) {
+            redisTemplate.delete("RT:" + email);
+        }
+
+        Long expiration = jwtTokenUtil.getExpiration(accessToken);
+        redisTemplate.opsForValue().set(accessToken, "logout", expiration, TimeUnit.MILLISECONDS);
+
 
         return "Success Logout";
     }
 
     @Transactional
-    public TokenDto refreshAccessToken(String refreshToken) {
-        // Refresh Token 검증
-        if (!jwtTokenUtil.refreshTokenValidation(refreshToken)) {
+    public TokenDto refreshAccessToken(String accessToken, String refreshToken) {
+        if (!jwtTokenUtil.tokenValidataion(refreshToken)) {
             throw new RuntimeException("Invalid Refresh Token");
         }
 
-        // Refresh Token에서 이메일 추출
-        String email = jwtTokenUtil.getEmailFromToken(refreshToken);
+        String email = jwtTokenUtil.getEmailFromToken(accessToken);
 
-        // 새로운 Access Token 및 Refresh Token 생성
-        TokenDto newTokenDto = jwtTokenUtil.createAllToken(email);
+        String getRefreshToken = (String)redisTemplate.opsForValue().get("RT:" + email);
 
-        // DB에 저장된 Refresh Token 갱신
-        Optional<RefreshToken> existingRefreshToken = refreshTokenRepository.findByUserEmail(email);
-        if (existingRefreshToken.isPresent()) {
-            existingRefreshToken.get().updateToken(newTokenDto.getRefreshToken());
-        } else {
-            RefreshToken newRefreshToken = new RefreshToken(newTokenDto.getRefreshToken(), email);
-            refreshTokenRepository.save(newRefreshToken);
+        if(ObjectUtils.isEmpty(getRefreshToken)) {
+            throw new IllegalArgumentException("Refresh Token이 존재하지 않습니다");
+        }
+        if(!refreshToken.equals(refreshToken)) {
+            throw new IllegalArgumentException("Refresh Token 정보가 일치하지 않습니다");
         }
 
-        return newTokenDto;
+        TokenDto tokenDto = jwtTokenUtil.createToken(email);
+
+
+        redisTemplate.opsForValue().set("RT:" + email, tokenDto.getRefreshToken(), tokenDto.getRefreshTokenExpirationTime(), TimeUnit.MILLISECONDS);
+
+        return tokenDto;
     }
 
 }

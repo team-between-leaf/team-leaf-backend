@@ -2,11 +2,9 @@ package com.team.leaf.user.account.controller;
 
 import com.team.leaf.user.account.dto.common.DuplicateEmailRequest;
 import com.team.leaf.user.account.dto.common.DuplicatePhoneRequest;
-import com.team.leaf.user.account.dto.common.LogoutRequest;
 import com.team.leaf.user.account.dto.request.jwt.AdditionalJoinInfoRequest;
 import com.team.leaf.user.account.dto.request.jwt.JwtJoinRequest;
 import com.team.leaf.user.account.dto.request.jwt.JwtLoginRequest;
-import com.team.leaf.user.account.dto.response.AccountDto;
 import com.team.leaf.user.account.dto.response.LoginAccountDto;
 import com.team.leaf.user.account.dto.response.TokenDto;
 import com.team.leaf.user.account.exception.ApiResponse;
@@ -54,16 +52,16 @@ public class AccountController {
 
     @DeleteMapping("/logout")
     @Operation(summary = "자체 로그인 로그아웃 API")
-    public ApiResponse<String> logout(@RequestBody LogoutRequest logoutRequest) {
-        String userEmail = logoutRequest.getEmail();
-        return new ApiResponse<>(accountService.logout(userEmail));
+    public ApiResponse<String> logout(@RequestHeader(name = JwtTokenUtil.ACCESS_TOKEN, required = false) String accessToken) {
+        return new ApiResponse<>(accountService.logout(accessToken));
     }
 
     @PostMapping("/issue/token")
     @Operation(summary= "Access Token 갱신 API")
-    public ResponseEntity<?> refreshAccessToken(@RequestHeader(name = JwtTokenUtil.REFRESH_TOKEN, required = false) String refreshToken) {
+    public ResponseEntity<?> refreshAccessToken(@RequestHeader(name = JwtTokenUtil.ACCESS_TOKEN, required = false) String accessToken,
+                                                @RequestHeader(name = JwtTokenUtil.REFRESH_TOKEN, required = false) String refreshToken) {
         try {
-            TokenDto newTokenDto = accountService.refreshAccessToken(refreshToken);
+            TokenDto newTokenDto = accountService.refreshAccessToken(accessToken, refreshToken);
 
             HttpHeaders headers = new HttpHeaders();
             headers.add(JwtTokenUtil.ACCESS_TOKEN, newTokenDto.getAccessToken());
