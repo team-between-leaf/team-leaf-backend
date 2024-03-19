@@ -1,11 +1,12 @@
 package com.team.leaf.shopping.cart.controller;
 
 import com.team.leaf.common.custom.LogIn;
+import com.team.leaf.shopping.cart.dto.request.CartProductOptionRequest;
+import com.team.leaf.shopping.cart.dto.request.CartProductRequest;
 import com.team.leaf.shopping.cart.service.CartService;
 import com.team.leaf.user.account.entity.AccountDetail;
 import com.team.leaf.user.account.exception.ApiResponse;
 import com.team.leaf.user.account.exception.ApiResponseStatus;
-import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Parameter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -21,8 +22,10 @@ public class CartController {
 
     @PostMapping("/cart/{productId}")
     @Operation(summary= "상품을 장바구니에 추가 API [ 사용자 인증 정보 필요 ] ")
-    public ApiResponse addProductToCart(@PathVariable long productId, @Parameter(hidden = true) @LogIn AccountDetail accountDetail) {
-        cartService.addProductToCart(productId, accountDetail);
+    public ApiResponse addProductToCart(@PathVariable(name = "productId") long productId,
+                                        @RequestBody CartProductRequest cartProductRequest,
+                                        @Parameter(hidden = true) @LogIn AccountDetail accountDetail) {
+        cartService.addProductToCart(productId,cartProductRequest, accountDetail);
 
         return new ApiResponse(ApiResponseStatus.SUCCESS);
     }
@@ -32,10 +35,12 @@ public class CartController {
         return new ApiResponse(cartService.getCart(accountDetail));
     }
 
-//    @PatchMapping("/cart/{productId}")
-//    public ApiResponse updateCart(@PathVariable long productId, @LogIn AccountDetail accountDetail){
-//        return new ApiResponse(cartService)
-//    }
+    @PatchMapping("/cart/{productId}")
+    public ApiResponse updateCart(@PathVariable(name = "productId") Long productId,
+                                  @RequestBody CartProductOptionRequest cartProductOptionRequest,
+                                  @LogIn AccountDetail accountDetail){
+        return new ApiResponse(cartService.updateCartOption(productId, cartProductOptionRequest));
+    }
 
     @DeleteMapping("/cart")
     public ApiResponse deleteCart(@RequestParam("productId") List<Long> productIds, @LogIn AccountDetail accountDetail){
