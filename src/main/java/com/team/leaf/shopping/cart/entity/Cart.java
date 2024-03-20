@@ -8,6 +8,8 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Entity
 @Getter
 @Builder
@@ -24,6 +26,9 @@ public class Cart {
 
     @ManyToOne(fetch = FetchType.LAZY)
     private Product product;
+
+    @OneToMany(mappedBy = "cart", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<CartProductOption> cartProductOption;
 
     @Builder.Default
     private int amount = 0;

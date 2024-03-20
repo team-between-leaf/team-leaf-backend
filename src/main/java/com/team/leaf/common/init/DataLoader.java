@@ -1,6 +1,7 @@
 package com.team.leaf.common.init;
 
 import com.team.leaf.shopping.cart.entity.Cart;
+import com.team.leaf.shopping.cart.entity.CartProductOption;
 import com.team.leaf.shopping.cart.repository.CartRepository;
 import com.team.leaf.shopping.coupon.entity.Coupon;
 import com.team.leaf.shopping.coupon.repository.CouponRepository;
@@ -22,7 +23,9 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 @Component
 @RequiredArgsConstructor
@@ -85,9 +88,15 @@ public class DataLoader implements CommandLineRunner {
         ProductOption color_option1 = ProductOption.builder().keyData("색상").valueData("blue").build();
         ProductOption color_option2 = ProductOption.builder().keyData("색상").valueData("red").build();
         ProductOption color_option3 = ProductOption.builder().keyData("색상").valueData("yellow").build();
+        ProductOption size_option1 = ProductOption.builder().keyData("사이즈").valueData("XL").build();
+        ProductOption size_option2 = ProductOption.builder().keyData("사이즈").valueData("L").build();
+        ProductOption size_option3 = ProductOption.builder().keyData("사이즈").valueData("M").build();
         product1.addProductOption(color_option1);
         product1.addProductOption(color_option2);
         product1.addProductOption(color_option3);
+        product1.addProductOption(size_option1);
+        product1.addProductOption(size_option2);
+        product1.addProductOption(size_option3);
 
         Product product2 = Product.builder().title("휴지").description("1576칸으로 구성된 두루마니 휴지입니다. 멸균이 잘 되어있는 아주 깨끗한 휴지").price(3000).seller(accountDetail3).discountRate(1.7).image("https://ibb.co/FDGnKLc").saleRate(5).views(0).registrationDate(LocalDateTime.of(2021, 5, 1, 11, 26, 00)).build();
         Product product3 = Product.builder().title("후라이팬").description("총알도 거뜬히 막는 후라이팬, 대충 강해보이는 후라이팬 그렇다구요").price(9000).seller(accountDetail3).discountRate(1.8).image("https://ibb.co/LJNsDs2").saleRate(20).views(0).registrationDate(LocalDateTime.of(2019, 8, 1, 5, 0, 00)).build();
@@ -121,11 +130,6 @@ public class DataLoader implements CommandLineRunner {
         Wish wish7 = Wish.builder().product(product6).user(accountDetail2).build();
         Wish wish8 = Wish.builder().product(product10).user(accountDetail2).build();
 
-        //Cart
-        Cart cart1 = Cart.builder().user(accountDetail1).product(product1).amount(1).build();
-        Cart cart2 = Cart.builder().user(accountDetail1).product(product2).amount(2).build();
-        Cart cart3 = Cart.builder().user(accountDetail2).product(product3).amount(3).build();
-
         //Coupon
         Coupon coupon1 = Coupon.builder().couponName("1번 쿠폰").saleRate(11).product(product1).build();
         Coupon coupon2 = Coupon.builder().couponName("2번 쿠폰").saleRate(22).product(product1).build();
@@ -137,7 +141,6 @@ public class DataLoader implements CommandLineRunner {
         productRepository.saveAll(Arrays.asList(product1, product2, product3, product4, product5, product6, product7, product8, product9, product10));
         wishRepository.saveAll(Arrays.asList(wish1, wish2, wish3, wish4, wish5, wish6, wish7, wish8));
         followRepository.saveAll(Arrays.asList(follow1, follow2, follow3, follow4));
-        cartRepository.saveAll(Arrays.asList(cart1, cart2, cart3));
         couponRepository.saveAll(Arrays.asList(coupon1, coupon2, coupon3));
 
     }
