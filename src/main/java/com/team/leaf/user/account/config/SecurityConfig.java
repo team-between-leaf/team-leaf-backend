@@ -60,13 +60,13 @@ public class SecurityConfig {
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
                 .authorizeHttpRequests((authorizeHttpRequests) -> authorizeHttpRequests
-                        .requestMatchers("/**" , "/account/**" , "/product/**" , "/alert/**" , "/cart/**" , "/seller/**").permitAll()
                         .requestMatchers("/swagger-ui.html", "/swagger-ui/**", "/v3/api-docs/**").permitAll()
-                        /*.requestMatchers("/alert/notify").hasAnyRole(AccountRole.USER.name(), AccountRole.SELLER.name())
-                        .requestMatchers("/cart/**", "/chat/room/buyer", "/product/{productId}/coupon/download/{couponId}", "/follow", "/product/{productId}/wish-list").hasRole(AccountRole.USER.name())
-                        .requestMatchers(HttpMethod.GET, "/product/wish").hasRole(AccountRole.USER.name())
-                        .requestMatchers("/chat/room/seller", "/product/{productId}/coupon", "/seller/notice", "/seller/notice/{noticeId}").hasRole(AccountRole.SELLER.name())
-                        .requestMatchers("/account/**", "/alert/**", "/board/**", "/chat/**", "/product/**", "/seller/**", "/error/**").permitAll()*/
+                        .requestMatchers("/account/**", "/alert/**", "/board/**","/alert/**", "/error/**").permitAll()
+                        .requestMatchers("/alert/notify").hasAnyAuthority(AccountRole.USER.name(), AccountRole.SELLER.name())
+                        .requestMatchers("/cart/**", "/chat/room/buyer", "/product/{productId}/coupon/download/{couponId}", "/follow", "/product/{productId}/wish-list").hasAuthority(AccountRole.USER.name())
+                        .requestMatchers(HttpMethod.GET, "/product/wish").hasAuthority(AccountRole.USER.name())
+                        .requestMatchers("/chat/room/seller", "/product/{productId}/coupon", "/seller/notice", "/seller/notice/{noticeId}").hasAuthority(AccountRole.SELLER.name())
+                        .requestMatchers("/product/**" , "/seller/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(new JwtTokenFilter(jwtTokenUtil, redisTemplate), UsernamePasswordAuthenticationFilter.class);
