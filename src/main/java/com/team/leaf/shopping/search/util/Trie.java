@@ -156,7 +156,6 @@ public class Trie {
         if(result.size() > 10) {
             result.subList(10, result.size()).clear();
         }
-        System.out.println(rootNode.toString());
 
         return result;
     }
