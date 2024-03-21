@@ -12,7 +12,7 @@ import java.util.*;
 
 @ToString
 class Node {
-    Map<Character, Node> childedNode = new HashMap<>();
+    Map<String, Node> childedNode = new HashMap<>();
     String word;
     boolean isContainWord;
     int frequency;
@@ -41,8 +41,8 @@ public class Trie {
         Node currentNode;
 
         if(isHangul(str)) {
-            node = addTrieNode_Hangul(str);
-            currentNode = createOrLoadAutoComplete(str);
+            node = addTrieNode(str);
+            currentNode = createOrLoadAutoComplete(node.word);
         } else {
             node = addTrieNode(str);
             currentNode = createOrLoadAutoComplete(node.word);
@@ -62,13 +62,17 @@ public class Trie {
         Node node = this.rootNode;
         List<Map<String, Integer>> separatedWord = GraphemeSeparation.separation(word);
 
-        System.out.println("나눈거: " + separatedWord);
+        String completeWord = "";
         for(int i = 0; i < separatedWord.size(); i++) {
             List<String> resultWord = GraphemeSeparation.absorption(separatedWord.get(i));
 
-            System.out.println("세분화 : " + resultWord);
-            for(String targetWord : resultWord) {
-                node = node.childedNode.computeIfAbsent(targetWord.charAt(0), key -> new Node(targetWord));
+            for(int j = 0; j < resultWord.size(); j++) {
+                String targetWord = resultWord.get(j);
+
+                completeWord += targetWord;
+                String finalCompleteWord = completeWord;
+
+                node = node.childedNode.computeIfAbsent(completeWord, key -> new Node(finalCompleteWord));
             }
         }
 
@@ -81,7 +85,7 @@ public class Trie {
         for(int i = 0; i < str.length(); i++) {
             int finalI = i;
 
-            node = node.childedNode.computeIfAbsent(str.charAt(i), key -> new Node(str.substring(0 , finalI + 1)));
+            node = node.childedNode.computeIfAbsent(str.substring(i , i + 1), key -> new Node(str.substring(0 , finalI + 1)));
         }
 
         return node;
@@ -97,7 +101,7 @@ public class Trie {
             for(int i = 0; i < str.length(); i++) {
                 int finalI = i;
 
-                node = node.childedNode.computeIfAbsent(str.charAt(i), key -> new Node(str.substring(0 , finalI + 1)));
+                node = node.childedNode.computeIfAbsent(str.substring(i , i + 1), key -> new Node(str.substring(0 , finalI + 1)));
             }
 
             node.isContainWord = true;
@@ -131,8 +135,8 @@ public class Trie {
                 result.add(new UtilInitDto(currentNode.word, currentNode.frequency));
             }
 
-            for(char ch : currentNode.childedNode.keySet()) {
-                queue.offer(currentNode.childedNode.get(ch));
+            for(String str : currentNode.childedNode.keySet()) {
+                queue.offer(currentNode.childedNode.get(str));
             }
         }
 
@@ -155,7 +159,7 @@ public class Trie {
         Node node = this.rootNode;
 
         for(int i = 0; i < str.length(); i++) {
-            node = node.childedNode.getOrDefault(str.charAt(i), null);
+            node = node.childedNode.getOrDefault(str.substring(i , i + 1), null);
 
             if(node == null) {
                 return null;
