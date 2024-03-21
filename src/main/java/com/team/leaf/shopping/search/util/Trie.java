@@ -35,14 +35,32 @@ public class Trie {
     Node rootNode = new Node("Empty");
     private final AutoCompleteRepository autoCompleteRepository;
 
+    public void initTrie() {
+        List<AutoComplete> result = autoCompleteRepository.findAll();
+
+        for(AutoComplete autoComplete : result) {
+            Node node;
+            String str = autoComplete.getWord();
+
+            if(isHangul(str)) {
+                node = addTrieNode_Hangul(str);
+            } else {
+                node = addTrieNode(str);
+            }
+
+            node.isContainWord = true;
+            node.frequency = autoComplete.getFrequency();
+        }
+    }
+
     @Transactional
     public Node insert(String str) {
         Node node;
         Node currentNode;
 
         if(isHangul(str)) {
-            node = addTrieNode(str);
-            currentNode = createOrLoadAutoComplete(node.word);
+            node = addTrieNode_Hangul(str);
+            currentNode = createOrLoadAutoComplete(str);
         } else {
             node = addTrieNode(str);
             currentNode = createOrLoadAutoComplete(node.word);
@@ -61,18 +79,18 @@ public class Trie {
     public Node addTrieNode_Hangul(String word) {
         Node node = this.rootNode;
         List<Map<String, Integer>> separatedWord = GraphemeSeparation.separation(word);
+        String [] completeWord = new String[separatedWord.size()];
 
-        String completeWord = "";
         for(int i = 0; i < separatedWord.size(); i++) {
             List<String> resultWord = GraphemeSeparation.absorption(separatedWord.get(i));
 
             for(int j = 0; j < resultWord.size(); j++) {
                 String targetWord = resultWord.get(j);
+                completeWord[i] = targetWord;
 
-                completeWord += targetWord;
-                String finalCompleteWord = completeWord;
+                String finalCompleteWord = String.join("" , completeWord).replaceAll("null","");
 
-                node = node.childedNode.computeIfAbsent(completeWord, key -> new Node(finalCompleteWord));
+                node = node.childedNode.computeIfAbsent(completeWord[i], key -> new Node(finalCompleteWord));
             }
         }
 
@@ -91,24 +109,6 @@ public class Trie {
         return node;
     }
 
-    public void initTrie() {
-        List<AutoComplete> result = autoCompleteRepository.findAll();
-
-        for(AutoComplete autoComplete : result) {
-            Node node = this.rootNode;
-            String str = autoComplete.getWord();
-
-            for(int i = 0; i < str.length(); i++) {
-                int finalI = i;
-
-                node = node.childedNode.computeIfAbsent(str.substring(i , i + 1), key -> new Node(str.substring(0 , finalI + 1)));
-            }
-
-            node.isContainWord = true;
-            node.frequency = autoComplete.getFrequency();
-        }
-    }
-
     protected Node createOrLoadAutoComplete(String word) {
         AutoComplete autoComplete = autoCompleteRepository.findAutoCompleteByWord(word)
                 .orElseGet(() -> autoCompleteRepository.save(AutoComplete.createAutoComplete(word)));
@@ -120,7 +120,13 @@ public class Trie {
 
     public List<UtilInitDto> searchComplete(String searchWord) {
         List<UtilInitDto> result = new ArrayList<>();
-        Node node = searchSearchWord(searchWord);
+        Node node;
+        if(isHangul(searchWord)) {
+            node = searchSearchWord_Hangul(searchWord);
+        } else {
+            node = searchSearchWord(searchWord);
+        }
+
         if(node == null) {
             return result;
         }
@@ -150,7 +156,7 @@ public class Trie {
         if(result.size() > 10) {
             result.subList(10, result.size()).clear();
         }
-        System.out.println(rootNode);
+        System.out.println(rootNode.toString());
 
         return result;
     }
@@ -163,6 +169,29 @@ public class Trie {
 
             if(node == null) {
                 return null;
+            }
+        }
+
+        return node;
+    }
+
+    private Node searchSearchWord_Hangul(String str) {
+        Node node = this.rootNode;
+
+        List<Map<String, Integer>> separatedWord = GraphemeSeparation.separation(str);
+        if(separatedWord.isEmpty()) {
+            return node.childedNode.getOrDefault(str, null);
+        }
+
+        for(int i = 0; i < separatedWord.size(); i++) {
+            List<String> resultWord = GraphemeSeparation.absorption(separatedWord.get(i));
+
+            for(int j = 0; j < resultWord.size(); j++) {
+                node = node.childedNode.getOrDefault(resultWord.get(j), null);
+
+                if(node == null) {
+                    return null;
+                }
             }
         }
 
