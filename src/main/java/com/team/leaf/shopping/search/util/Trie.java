@@ -37,6 +37,45 @@ public class Trie {
 
     @Transactional
     public Node insert(String str) {
+        Node node;
+        Node currentNode;
+
+        if(isHangul(str)) {
+            node = addTrieNode_Hangul(str);
+            currentNode = createOrLoadAutoComplete(str);
+        } else {
+            node = addTrieNode(str);
+            currentNode = createOrLoadAutoComplete(node.word);
+        }
+
+        node.isContainWord = true;
+        node.frequency = currentNode.frequency;
+
+        return node;
+    }
+
+    public static boolean isHangul(String str) {
+        return str.matches(".*[ㄱ-ㅎㅏ-ㅣ가-힣]+.*");
+    }
+
+    public Node addTrieNode_Hangul(String word) {
+        Node node = this.rootNode;
+        List<Map<String, Integer>> separatedWord = GraphemeSeparation.separation(word);
+
+        System.out.println("나눈거: " + separatedWord);
+        for(int i = 0; i < separatedWord.size(); i++) {
+            List<String> resultWord = GraphemeSeparation.absorption(separatedWord.get(i));
+
+            System.out.println("세분화 : " + resultWord);
+            for(String targetWord : resultWord) {
+                node = node.childedNode.computeIfAbsent(targetWord.charAt(0), key -> new Node(targetWord));
+            }
+        }
+
+        return node;
+    }
+
+    public Node addTrieNode(String str) {
         Node node = this.rootNode;
 
         for(int i = 0; i < str.length(); i++) {
@@ -44,10 +83,6 @@ public class Trie {
 
             node = node.childedNode.computeIfAbsent(str.charAt(i), key -> new Node(str.substring(0 , finalI + 1)));
         }
-
-        Node currentNode = createOrLoadAutoComplete(node.word);
-        node.isContainWord = true;
-        node.frequency = currentNode.frequency;
 
         return node;
     }
@@ -111,6 +146,7 @@ public class Trie {
         if(result.size() > 10) {
             result.subList(10, result.size()).clear();
         }
+        System.out.println(rootNode);
 
         return result;
     }
