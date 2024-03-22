@@ -60,7 +60,7 @@ public class SecurityConfig {
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
                 .authorizeHttpRequests((authorizeHttpRequests) -> authorizeHttpRequests
-                        .requestMatchers("/swagger-ui.html", "/swagger-ui/**", "/v3/api-docs/**").permitAll()
+                        .requestMatchers("/swagger-ui.html", "/swagger-ui/**", "/v3/api-docs/**" , "/auto-complete").permitAll()
                         .requestMatchers("/account/**", "/alert/**", "/board/**","/alert/**", "/error/**").permitAll()
                         .requestMatchers("/alert/notify").hasAnyAuthority(AccountRole.USER.name(), AccountRole.SELLER.name())
                         .requestMatchers("/cart/**", "/chat/room/buyer", "/product/{productId}/coupon/download/{couponId}", "/follow", "/product/{productId}/wish-list").hasAuthority(AccountRole.USER.name())
