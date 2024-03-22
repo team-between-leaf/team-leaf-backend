@@ -112,7 +112,7 @@ public class Trie {
 
     public Node addTrieNode_English(String str, Node node, String[] totalWord) {
         for(int i = 0; i < str.length(); i++) {
-            node = node.childedNode.computeIfAbsent(str.substring(i , i + 1), key -> new Node(convertArrayToString(totalWord)));
+            node = node.childedNode.computeIfAbsent(str.substring(i , i + 1).toLowerCase(), key -> new Node(convertArrayToString(totalWord)));
         }
 
         return node;
@@ -177,7 +177,7 @@ public class Trie {
     private Node searchSearchWord_English(String str, Node node) {
 
         for(int i = 0; i < str.length(); i++) {
-            node = node.childedNode.getOrDefault(str.substring(i , i + 1), null );
+            node = node.childedNode.getOrDefault(str.substring(i , i + 1).toLowerCase(), null );
 
             if(node == null) {
                 return null;
