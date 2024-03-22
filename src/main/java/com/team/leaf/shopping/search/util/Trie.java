@@ -50,7 +50,7 @@ public class Trie {
                 if(isHangul(targetString)) {
                     node = addTrieNode_Hangul(targetString, node, completeWord, i);
                 } else {
-                    node = addTrieNode(targetString, node, completeWord);
+                    node = addTrieNode_English(targetString, node, completeWord);
                 }
             }
 
@@ -72,7 +72,7 @@ public class Trie {
             if(isHangul(targetString)) {
                 node = addTrieNode_Hangul(targetString, node, completeWord, i);
             } else {
-                node = addTrieNode(targetString, node, completeWord);
+                node = addTrieNode_English(targetString, node, completeWord);
             }
         }
 
@@ -110,7 +110,7 @@ public class Trie {
         return node;
     }
 
-    public Node addTrieNode(String str, Node node, String[] totalWord) {
+    public Node addTrieNode_English(String str, Node node, String[] totalWord) {
         for(int i = 0; i < str.length(); i++) {
             node = node.childedNode.computeIfAbsent(str.substring(i , i + 1), key -> new Node(convertArrayToString(totalWord)));
         }
@@ -129,15 +129,20 @@ public class Trie {
 
     public List<UtilInitDto> searchComplete(String searchWord) {
         List<UtilInitDto> result = new ArrayList<>();
-        Node node;
-        if(isHangul(searchWord)) {
-            node = searchSearchWord_Hangul(searchWord);
-        } else {
-            node = searchSearchWord(searchWord);
-        }
+        Node node = this.rootNode;
 
-        if(node == null) {
-            return result;
+        for(int i = 0; i < searchWord.length(); i++) {
+            String targetWord = searchWord.substring(i , i + 1);
+
+            if(isHangul(targetWord)) {
+                node = searchSearchWord_Hangul(targetWord, node);
+            } else {
+                node = searchSearchWord_English(targetWord, node);
+            }
+
+            if(node == null) {
+                return result;
+            }
         }
 
         Queue<Node> queue = new LinkedList<>();
@@ -165,16 +170,14 @@ public class Trie {
         if(result.size() > 10) {
             result.subList(10, result.size()).clear();
         }
-        System.out.println(rootNode);
 
         return result;
     }
 
-    private Node searchSearchWord(String str) {
-        Node node = this.rootNode;
+    private Node searchSearchWord_English(String str, Node node) {
 
         for(int i = 0; i < str.length(); i++) {
-            node = node.childedNode.getOrDefault(str.substring(i , i + 1),null);
+            node = node.childedNode.getOrDefault(str.substring(i , i + 1), null );
 
             if(node == null) {
                 return null;
@@ -184,8 +187,7 @@ public class Trie {
         return node;
     }
 
-    private Node searchSearchWord_Hangul(String str) {
-        Node node = this.rootNode;
+    private Node searchSearchWord_Hangul(String str, Node node) {
         List<Map<String, Integer>> separatedWord = GraphemeSeparation.separation(str);
 
         if(separatedWord.isEmpty()) {
