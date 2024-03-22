@@ -39,13 +39,19 @@ public class Trie {
         List<AutoComplete> result = autoCompleteRepository.findAll();
 
         for(AutoComplete autoComplete : result) {
-            Node node;
+            Node node = this.rootNode;
             String str = autoComplete.getWord();
+            String [] completeWord = new String[str.length()];
 
-            if(isHangul(str)) {
-                node = addTrieNode_Hangul(str);
-            } else {
-                node = addTrieNode(str);
+            for(int i = 0; i < completeWord.length; i++) {
+                String targetString = str.substring(i , i + 1);
+                completeWord[i] = targetString;
+
+                if(isHangul(targetString)) {
+                    node = addTrieNode_Hangul(targetString, node, completeWord, i);
+                } else {
+                    node = addTrieNode(targetString, node, completeWord);
+                }
             }
 
             node.isContainWord = true;
@@ -55,16 +61,22 @@ public class Trie {
 
     @Transactional
     public Node insert(String str) {
-        Node node;
+        Node node = this.rootNode;
         Node currentNode;
+        String [] completeWord = new String[str.length()];
 
-        if(isHangul(str)) {
-            node = addTrieNode_Hangul(str);
-            currentNode = createOrLoadAutoComplete(str);
-        } else {
-            node = addTrieNode(str);
-            currentNode = createOrLoadAutoComplete(node.word);
+        for(int i = 0; i < str.length(); i++) {
+            String targetString = str.substring(i , i + 1);
+            completeWord[i] = targetString;
+
+            if(isHangul(targetString)) {
+                node = addTrieNode_Hangul(targetString, node, completeWord, i);
+            } else {
+                node = addTrieNode(targetString, node, completeWord);
+            }
         }
+
+        currentNode = createOrLoadAutoComplete(node.word);
 
         node.isContainWord = true;
         node.frequency = currentNode.frequency;
@@ -76,34 +88,31 @@ public class Trie {
         return str.matches(".*[ㄱ-ㅎㅏ-ㅣ가-힣]+.*");
     }
 
-    public Node addTrieNode_Hangul(String word) {
-        Node node = this.rootNode;
+
+    public static String convertArrayToString(String [] arr) {
+        return String.join("" , arr).replaceAll("null","");
+    }
+
+    public Node addTrieNode_Hangul(String word, Node node, String [] totalWord, int index) {
         List<Map<String, Integer>> separatedWord = GraphemeSeparation.separation(word);
-        String [] completeWord = new String[separatedWord.size()];
 
         for(int i = 0; i < separatedWord.size(); i++) {
             List<String> resultWord = GraphemeSeparation.absorption(separatedWord.get(i));
 
             for(int j = 0; j < resultWord.size(); j++) {
                 String targetWord = resultWord.get(j);
-                completeWord[i] = targetWord;
+                totalWord[index] = targetWord;
 
-                String finalCompleteWord = String.join("" , completeWord).replaceAll("null","");
-
-                node = node.childedNode.computeIfAbsent(completeWord[i], key -> new Node(finalCompleteWord));
+                node = node.childedNode.computeIfAbsent(targetWord, key -> new Node(convertArrayToString(totalWord)));
             }
         }
 
         return node;
     }
 
-    public Node addTrieNode(String str) {
-        Node node = this.rootNode;
-
+    public Node addTrieNode(String str, Node node, String[] totalWord) {
         for(int i = 0; i < str.length(); i++) {
-            int finalI = i;
-
-            node = node.childedNode.computeIfAbsent(str.substring(i , i + 1), key -> new Node(str.substring(0 , finalI + 1)));
+            node = node.childedNode.computeIfAbsent(str.substring(i , i + 1), key -> new Node(convertArrayToString(totalWord)));
         }
 
         return node;
@@ -156,6 +165,7 @@ public class Trie {
         if(result.size() > 10) {
             result.subList(10, result.size()).clear();
         }
+        System.out.println(rootNode);
 
         return result;
     }
@@ -164,7 +174,7 @@ public class Trie {
         Node node = this.rootNode;
 
         for(int i = 0; i < str.length(); i++) {
-            node = node.childedNode.getOrDefault(str.substring(i , i + 1), null);
+            node = node.childedNode.getOrDefault(str.substring(i , i + 1),null);
 
             if(node == null) {
                 return null;
@@ -176,8 +186,8 @@ public class Trie {
 
     private Node searchSearchWord_Hangul(String str) {
         Node node = this.rootNode;
-
         List<Map<String, Integer>> separatedWord = GraphemeSeparation.separation(str);
+
         if(separatedWord.isEmpty()) {
             return node.childedNode.getOrDefault(str, null);
         }
