@@ -7,6 +7,7 @@ import com.team.leaf.shopping.history.service.HistoryService;
 import com.team.leaf.user.account.entity.AccountDetail;
 import com.team.leaf.user.account.exception.ApiResponse;
 import com.team.leaf.user.account.exception.ApiResponseStatus;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -21,6 +22,7 @@ public class HistoryController {
     private final HistoryService historyService;
 
     @DeleteMapping("/{historyId}")
+    @Operation(summary= "[ 사용자 인증 정보 필요 ] 특정 history 삭제")
     public ApiResponse deleteHistory(@PathVariable long historyId, @LogIn @Parameter(hidden = true) AccountDetail accountDetail) {
         historyService.deleteHistory(historyId, accountDetail);
 
@@ -28,6 +30,7 @@ public class HistoryController {
     }
 
     @PostMapping
+    @Operation(summary= "[ 사용자 인증 정보 필요 ] history 등록")
     public ApiResponse addHistory(@RequestBody HistoryRequest request, @LogIn @Parameter(hidden = true) AccountDetail accountDetail) {
         historyService.addHistory(request, accountDetail);
 
@@ -35,6 +38,7 @@ public class HistoryController {
     }
 
     @GetMapping
+    @Operation(summary= "[ 사용자 인증 정보 필요 ] 모든 history 가져오기")
     public ApiResponse getAllHistory(@LogIn @Parameter(hidden = true) AccountDetail accountDetail) {
         List<History> result = historyService.getAllHistory(accountDetail);
 
@@ -42,6 +46,7 @@ public class HistoryController {
     }
 
     @DeleteMapping
+    @Operation(summary= "[ 사용자 인증 정보 필요 ] 모든 history 삭제")
     public ApiResponse deleteAllHistory(@LogIn @Parameter(hidden = true) AccountDetail accountDetail) {
         historyService.deleteAllHistory(accountDetail);
 
