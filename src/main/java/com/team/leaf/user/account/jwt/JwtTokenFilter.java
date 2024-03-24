@@ -29,9 +29,8 @@ public class JwtTokenFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
 
-        String cookie_accessToken = getTokenByToken(request, "accessToken");
-        String cookie_refreshToken = getTokenByToken(request, "refreshToken");
-
+        String cookie_accessToken = getTokenByRequest(request, "accessToken");
+        String cookie_refreshToken = getTokenByRequest(request, "refreshToken");
         String accessToken = jwtTokenUtil.getHeaderToken(request, "Access");
         String refreshToken = jwtTokenUtil.getHeaderToken(request, "Refresh");
 
@@ -80,8 +79,8 @@ public class JwtTokenFilter extends OncePerRequestFilter {
         }
     }
 
-    public String getTokenByToken(HttpServletRequest request, String type) {
-        Cookie cookies[] = ((HttpServletRequest) request).getCookies();
+    public static String getTokenByRequest(HttpServletRequest request, String type) {
+        Cookie cookies[] = request.getCookies();
 
         if (cookies != null && cookies.length != 0) {
             return Arrays.stream(cookies)

@@ -224,12 +224,12 @@ public class AccountService {
     }
 
     @Transactional
-    public TokenDto refreshAccessToken(String accessToken, String refreshToken) {
+    public TokenDto refreshAccessToken(String refreshToken) {
         if (!jwtTokenUtil.tokenValidataion(refreshToken)) {
             throw new RuntimeException("Invalid Refresh Token");
         }
 
-        String email = jwtTokenUtil.getEmailFromToken(accessToken);
+        String email = jwtTokenUtil.getEmailFromToken(refreshToken);
 
         String getRefreshToken = (String)redisTemplate.opsForValue().get("RT:" + email);
 

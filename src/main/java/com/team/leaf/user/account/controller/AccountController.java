@@ -8,10 +8,12 @@ import com.team.leaf.user.account.dto.request.jwt.JwtLoginRequest;
 import com.team.leaf.user.account.dto.response.LoginAccountDto;
 import com.team.leaf.user.account.dto.response.TokenDto;
 import com.team.leaf.user.account.exception.ApiResponse;
+import com.team.leaf.user.account.jwt.JwtTokenFilter;
 import com.team.leaf.user.account.jwt.JwtTokenUtil;
 import com.team.leaf.user.account.service.AccountService;
 import com.team.leaf.user.account.service.CommonService;
 import io.swagger.v3.oas.annotations.Operation;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -58,16 +60,22 @@ public class AccountController {
 
     @PostMapping("/issue/token")
     @Operation(summary= "Access Token 갱신 API")
-    public ResponseEntity<?> refreshAccessToken(@RequestHeader(name = JwtTokenUtil.ACCESS_TOKEN, required = false) String accessToken,
+    public ResponseEntity<?> refreshAccessToken(HttpServletRequest request, HttpServletResponse response,
                                                 @RequestHeader(name = JwtTokenUtil.REFRESH_TOKEN, required = false) String refreshToken) {
         try {
-            TokenDto newTokenDto = accountService.refreshAccessToken(accessToken, refreshToken);
+            TokenDto newTokenDto = null;
 
-            HttpHeaders headers = new HttpHeaders();
-            headers.add(JwtTokenUtil.ACCESS_TOKEN, newTokenDto.getAccessToken());
-            headers.add(JwtTokenUtil.REFRESH_TOKEN, newTokenDto.getRefreshToken());
+            if(refreshToken == null) {
+                String cookie_refreshToken = JwtTokenFilter.getTokenByRequest(request, "refreshToken");
 
-            return new ResponseEntity<>(headers, HttpStatus.OK);
+                newTokenDto = accountService.refreshAccessToken(cookie_refreshToken);
+            } else {
+                newTokenDto = accountService.refreshAccessToken(refreshToken);
+            }
+
+            commonService.setHeader(response, newTokenDto);
+
+            return new ResponseEntity<>(newTokenDto, HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>("Failed to refresh access token", HttpStatus.UNAUTHORIZED);
         }

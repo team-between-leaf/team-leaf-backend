@@ -70,6 +70,7 @@ public class JwtTokenUtil {
                 .compact();
 
         String refreshToken = Jwts.builder()
+                .setSubject(email)
                 .setExpiration(new Date(date.getTime() + REFRESH_TIME))
                 .setIssuedAt(date)
                 .signWith(SignatureAlgorithm.HS256, key)
