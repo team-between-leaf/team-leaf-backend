@@ -157,7 +157,7 @@ public class JwtTokenUtil {
 
         //DB에 저장된 토큰 비교
         Optional<RefreshToken> refreshToken = refreshTokenRepository.findByRefreshTokenAndPlatformOrderByRefreshId(token, platform);
-        System.out.println("있나요? " + refreshToken.isPresent());
+
         return refreshToken.isPresent() && token.equals(refreshToken.get().getRefreshToken());
     }
 
