@@ -85,6 +85,7 @@ public class JwtTokenUtil {
         if(!tokenValidation(refreshToken)) {
             throw new RuntimeException("변조된 토큰입니다.");
         }
+
         Date date = new Date();
         String email = getEmailFromToken(refreshToken);
         AccountRole role = getRoleFromEmail(email);
@@ -94,18 +95,20 @@ public class JwtTokenUtil {
                 .claim("role", role.name())
                 .setExpiration(new Date(date.getTime() + ACCESS_TIME))
                 .setIssuedAt(date)
-                .signWith(SignatureAlgorithm.HS256, key)
+                .signWith(SignatureAlgorithm.HS256, key )
                 .compact();
     }
 
     //refreshToken 검증
     public Boolean tokenValidation(String token) {
         try {
-            Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token);
+            //Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token);
+            Jwts.parser().setSigningKey(token).parseClaimsJws(token);
 
             return true;
         } catch (SecurityException | MalformedJwtException e) {
             log.error("Invalid JWT signature");
+            e.printStackTrace();
             return false;
         } catch (ExpiredJwtException e) {
             log.error("Expired JWT");
@@ -137,12 +140,26 @@ public class JwtTokenUtil {
             }
         }
 
-        return Jwts.builder()
+        String refreshTokenData = Jwts.builder()
                 .setSubject(email)
                 .setExpiration(new Date(date.getTime() + REFRESH_TIME))
                 .setIssuedAt(date)
                 .signWith(SignatureAlgorithm.HS256, key)
                 .compact();
+
+        refreshTokenRepository.save(new RefreshToken(refreshTokenData, email, platform));
+
+        return refreshTokenData;
+    }
+
+    public Boolean refreshTokenValidation(String token, Platform platform) {
+        //1차 검증
+        if (!tokenValidation(token)) return false;
+
+        //DB에 저장된 토큰 비교
+        Optional<RefreshToken> refreshToken = refreshTokenRepository.findByRefreshTokenAndPlatformOrderByRefreshId(token, platform);
+
+        return refreshToken.isPresent() && token.equals(refreshToken.get().getRefreshToken());
     }
 
     public Boolean refreshTokenValidation(String token) {
@@ -150,7 +167,7 @@ public class JwtTokenUtil {
         if (!tokenValidation(token)) return false;
 
         //DB에 저장된 토큰 비교
-        Optional<RefreshToken> refreshToken = refreshTokenRepository.findByUserEmail(getEmailFromToken(token));
+        Optional<RefreshToken> refreshToken = refreshTokenRepository.findByUserEmailAndRefreshToken(getEmailFromToken(token), token);
 
         return refreshToken.isPresent() && token.equals(refreshToken.get().getRefreshToken());
     }

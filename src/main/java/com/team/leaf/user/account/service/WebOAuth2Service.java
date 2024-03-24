@@ -38,7 +38,6 @@ public class WebOAuth2Service {
     private final RefreshTokenRepository refreshTokenRepository;
     private final CommonService commonService;
     private final List<OAuth2LoginInfo> oAuth2LoginInfoList;
-    private final AuthenticationManagerBuilder authenticationManagerBuilder;
     private final RedisTemplate redisTemplate;
 
     /*public ResponseEntity<String> requestAccessToken(OAUth2LoginType type, String code) {
@@ -110,7 +109,7 @@ public class WebOAuth2Service {
     }
 
     @Transactional
-    public String logout(String accessToken) {
+    public String logout(String accessToken, String refreshToken) {
         if(!jwtTokenUtil.tokenValidation(accessToken)) {
             throw new IllegalArgumentException("Invalid Access Token");
         }
@@ -123,7 +122,7 @@ public class WebOAuth2Service {
 
         Long expiration = jwtTokenUtil.getExpiration(accessToken);
         redisTemplate.opsForValue().set(accessToken, "logout", expiration, TimeUnit.MILLISECONDS);
-
+        refreshTokenRepository.deleteByRefreshToken(refreshToken);
 
         return "Success Logout";
     }

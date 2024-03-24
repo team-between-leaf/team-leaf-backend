@@ -8,6 +8,7 @@ import com.team.leaf.user.account.entity.*;
 import com.team.leaf.user.account.jwt.JwtTokenUtil;
 import com.team.leaf.user.account.repository.AccountRepository;
 import com.team.leaf.user.account.repository.InterestCategoryRepository;
+import com.team.leaf.user.account.repository.RefreshTokenRepository;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -33,6 +34,7 @@ public class AccountService {
     private final JwtTokenUtil jwtTokenUtil;
     private final SecurityConfig jwtSecurityConfig;
     private final RedisTemplate redisTemplate;
+    private final RefreshTokenRepository refreshTokenRepository;
 
     private void validatePassword(String password) {
         String passwordRegex = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=!])(?=\\S+$).{9,22}$";
@@ -120,7 +122,6 @@ public class AccountService {
 
     @Transactional
     public LoginAccountDto login(JwtLoginRequest request, HttpServletResponse response) {
-
         // 이메일로 유저 정보 확인
         AccountDetail accountDetail = accountRepository.findByEmail(request.getEmail()).orElseThrow(() ->
                 new RuntimeException("사용자를 찾을 수 없습니다."));
@@ -203,7 +204,7 @@ public class AccountService {
     }
 
     @Transactional
-    public String logout(String accessToken) {
+    public String logout(String accessToken, String refreshToken) {
         if(!jwtTokenUtil.tokenValidation(accessToken)) {
             throw new IllegalArgumentException("Invalid Access Token");
         }
@@ -215,15 +216,16 @@ public class AccountService {
         }
 
         Long expiration = jwtTokenUtil.getExpiration(accessToken);
-        redisTemplate.opsForValue().set(accessToken, "logout", expiration, TimeUnit.MILLISECONDS);
+        refreshTokenRepository.deleteByRefreshToken(refreshToken);
 
+        redisTemplate.opsForValue().set(accessToken, "logout", expiration, TimeUnit.MILLISECONDS);
 
         return "Success Logout";
     }
 
     @Transactional
-    public TokenDto refreshAccessToken(String refreshToken) {
-        if (!jwtTokenUtil.tokenValidation(refreshToken) && jwtTokenUtil.refreshTokenValidation(refreshToken)) {
+    public TokenDto refreshAccessToken(Platform platform, String refreshToken) {
+        if (jwtTokenUtil.refreshTokenValidation(refreshToken, platform)) {
             throw new RuntimeException("Invalid Refresh Token");
         }
 

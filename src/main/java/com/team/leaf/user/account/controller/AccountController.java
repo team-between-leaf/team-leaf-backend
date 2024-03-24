@@ -52,23 +52,25 @@ public class AccountController {
 
     @DeleteMapping("/logout")
     @Operation(summary = "자체 로그인 로그아웃 API")
-    public ApiResponse<String> logout(@RequestHeader(name = JwtTokenUtil.ACCESS_TOKEN, required = false) String accessToken) {
-        return new ApiResponse<>(accountService.logout(accessToken));
+    public ApiResponse<String> logout(@RequestHeader(name = JwtTokenUtil.ACCESS_TOKEN) String accessToken,
+                                      @RequestHeader(name = JwtTokenUtil.REFRESH_TOKEN) String refreshToken) {
+        return new ApiResponse<>(accountService.logout(accessToken, refreshToken));
     }
 
     @PostMapping("/issue/token")
     @Operation(summary= "Access Token 갱신 API")
     public ResponseEntity<?> refreshAccessToken(HttpServletRequest request, HttpServletResponse response,
-                                                @RequestHeader(name = JwtTokenUtil.REFRESH_TOKEN, required = false) String refreshToken) {
+                                                @RequestHeader(name = JwtTokenUtil.REFRESH_TOKEN, required = false) String refreshToken,
+                                                @RequestBody PlatformRequest platformRequest ) {
         try {
             TokenDto newTokenDto = null;
 
             if(refreshToken == null) {
                 String cookie_refreshToken = JwtTokenFilter.getTokenByRequest(request, "refreshToken");
 
-                newTokenDto = accountService.refreshAccessToken(cookie_refreshToken);
+                newTokenDto = accountService.refreshAccessToken(platformRequest.getPlatform(), cookie_refreshToken);
             } else {
-                newTokenDto = accountService.refreshAccessToken(refreshToken);
+                newTokenDto = accountService.refreshAccessToken(platformRequest.getPlatform(), refreshToken);
             }
 
             commonService.setHeader(response, newTokenDto);

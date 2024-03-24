@@ -30,8 +30,9 @@ public class WebOAuth2Controller {
 
     @DeleteMapping("/logout")
     @Operation(summary = "소셜 로그인 로그아웃 API")
-    public ApiResponse<String> logout(@RequestHeader(name = JwtTokenUtil.ACCESS_TOKEN, required = false) String accessToken) {
-        return new ApiResponse<>(oAuthService.logout(accessToken));
+    public ApiResponse<String> logout(@RequestHeader(name = JwtTokenUtil.ACCESS_TOKEN) String accessToken,
+                                      @RequestHeader(name = JwtTokenUtil.REFRESH_TOKEN) String refreshToken) {
+        return new ApiResponse<>(oAuthService.logout(accessToken, refreshToken));
     }
 
     @PostMapping("/issue/token")
