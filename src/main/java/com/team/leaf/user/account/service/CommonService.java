@@ -9,6 +9,7 @@ import com.team.leaf.user.account.repository.AccountRepository;
 import com.team.leaf.user.account.repository.OAuth2Repository;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseCookie;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -79,6 +80,30 @@ public class CommonService {
     public void setHeader(HttpServletResponse response, TokenDto tokenDto) {
         response.addHeader(JwtTokenUtil.ACCESS_TOKEN, tokenDto.getAccessToken());
         response.addHeader(JwtTokenUtil.REFRESH_TOKEN, tokenDto.getRefreshToken());
+        response.addHeader("Set-Cookie", createAccessToken(tokenDto.getAccessToken()).toString());
+        response.addHeader("Set-Cookie", createRefreshToken(tokenDto.getRefreshToken()).toString());
+    }
+
+    public static ResponseCookie createAccessToken(String access) {
+        return ResponseCookie.from("accessToken" , access)
+                .path("/")
+                .maxAge(30 * 60 * 1000)
+                //.secure(true)
+                //.domain()
+                .httpOnly(true)
+                //.sameSite("none")
+                .build();
+    }
+
+    public static ResponseCookie createRefreshToken(String refresh) {
+        return ResponseCookie.from("refreshToken" , refresh)
+                .path("/")
+                .maxAge(14 * 24 * 60 * 60 * 1000)
+                //.secure(true)
+                //.domain()
+                .httpOnly(true)
+                //.sameSite("none")
+                .build();
     }
 
 }

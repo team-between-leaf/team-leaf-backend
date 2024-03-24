@@ -38,7 +38,7 @@ public class JwtTokenUtil {
     private final AccountRepository accountRepository;
     private final OAuth2Repository oAuth2Repository;
     //private static final String AUTHORITIES_KEY = "auth";
-    public static final String ACCESS_TOKEN = "access_token";
+    public static final String ACCESS_TOKEN = "Authorization";
     public static final String REFRESH_TOKEN = "refresh_token";
     private static final long ACCESS_TIME = Duration.ofMinutes(30).toMillis(); // 만료시간 30분
     private static final long REFRESH_TIME = Duration.ofDays(14).toMillis(); // 만료시간 2주
