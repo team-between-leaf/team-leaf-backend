@@ -1,5 +1,6 @@
 package com.team.leaf.user.account.service;
 
+import com.team.leaf.user.account.dto.request.jwt.Platform;
 import com.team.leaf.user.account.dto.request.oauth.OAuth2LoginType;
 import com.team.leaf.user.account.dto.response.OAuth2LoginResponse;
 import com.team.leaf.user.account.dto.response.TokenDto;
@@ -43,7 +44,7 @@ public class AppOAuth2Service {
                 .orElseThrow(() -> new AccountException("알 수 없는 로그인 타입입니다."));
     }
 
-    public OAuth2LoginResponse oAuth2Login(OAuth2LoginType type, String accessToken, HttpServletResponse response) {
+    public OAuth2LoginResponse oAuth2Login(Platform platform, OAuth2LoginType type, String accessToken, HttpServletResponse response) {
         OAuth2LoginInfo oAuth2LoginInfo = findOAuth2LoginType(type);
 
         ResponseEntity<String> userInfoRes = oAuth2LoginInfo.requestUserInfoForApp(accessToken);
@@ -62,7 +63,7 @@ public class AppOAuth2Service {
             oAuth2Repository.save(oAuth2Account);
         }
 
-        TokenDto tokenDto = jwtTokenUtil.createToken(oAuth2Account.getEmail());
+        TokenDto tokenDto = jwtTokenUtil.createToken(platform, oAuth2Account.getEmail());
 
         redisTemplate.opsForValue().set("RT:" + oAuth2Account.getEmail(), tokenDto.getRefreshToken(), tokenDto.getRefreshTokenExpirationTime(), TimeUnit.MILLISECONDS);
 
@@ -72,12 +73,12 @@ public class AppOAuth2Service {
     }
 
     @Transactional
-    public TokenDto refreshAccessToken(String accessToken, String refreshToken) {
-        if (!jwtTokenUtil.tokenValidataion(refreshToken)) {
+    public TokenDto refreshAccessToken(Platform platform, String refreshToken) {
+        if (!jwtTokenUtil.tokenValidation(refreshToken)) {
             throw new RuntimeException("Invalid Refresh Token");
         }
 
-        String email = jwtTokenUtil.getEmailFromToken(accessToken);
+        String email = jwtTokenUtil.getEmailFromToken(refreshToken);
 
         String getRefreshToken = (String)redisTemplate.opsForValue().get("RT:" + email);
 
@@ -88,7 +89,7 @@ public class AppOAuth2Service {
             throw new IllegalArgumentException("Refresh Token 정보가 일치하지 않습니다");
         }
 
-        TokenDto tokenDto = jwtTokenUtil.createToken(email);
+        TokenDto tokenDto = jwtTokenUtil.createToken(platform, email);
 
 
         redisTemplate.opsForValue().set("RT:" + email, tokenDto.getRefreshToken(), tokenDto.getRefreshTokenExpirationTime(), TimeUnit.MILLISECONDS);
@@ -98,7 +99,7 @@ public class AppOAuth2Service {
 
     @Transactional
     public String logout(String accessToken) {
-        if(!jwtTokenUtil.tokenValidataion(accessToken)) {
+        if(!jwtTokenUtil.tokenValidation(accessToken)) {
             throw new IllegalArgumentException("Invalid Access Token");
         }
 

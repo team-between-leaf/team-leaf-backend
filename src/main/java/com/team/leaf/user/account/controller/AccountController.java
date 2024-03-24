@@ -2,9 +2,7 @@ package com.team.leaf.user.account.controller;
 
 import com.team.leaf.user.account.dto.common.DuplicateEmailRequest;
 import com.team.leaf.user.account.dto.common.DuplicatePhoneRequest;
-import com.team.leaf.user.account.dto.request.jwt.AdditionalJoinInfoRequest;
-import com.team.leaf.user.account.dto.request.jwt.JwtJoinRequest;
-import com.team.leaf.user.account.dto.request.jwt.JwtLoginRequest;
+import com.team.leaf.user.account.dto.request.jwt.*;
 import com.team.leaf.user.account.dto.response.LoginAccountDto;
 import com.team.leaf.user.account.dto.response.TokenDto;
 import com.team.leaf.user.account.exception.ApiResponse;

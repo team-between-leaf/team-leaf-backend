@@ -1,7 +1,9 @@
 package com.team.leaf.user.account.service;
 
+import com.team.leaf.user.account.dto.request.jwt.Platform;
 import com.team.leaf.user.account.dto.request.oauth.OAuth2LoginType;
 import com.team.leaf.user.account.dto.request.oauth.OAuth2TokenDto;
+import com.team.leaf.user.account.dto.request.oauth.OAuthLoginRequest;
 import com.team.leaf.user.account.dto.response.OAuth2LoginResponse;
 import com.team.leaf.user.account.dto.response.TokenDto;
 import com.team.leaf.user.account.entity.AccountRole;
@@ -23,6 +25,8 @@ import org.springframework.util.ObjectUtils;
 
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+
+import static com.team.leaf.user.account.jwt.JwtTokenUtil.REFRESH_TIME;
 
 @Service
 @Slf4j
@@ -49,9 +53,9 @@ public class WebOAuth2Service {
                 .orElseThrow(() -> new AccountException("알 수 없는 로그인 타입입니다."));
     }
 
-    public OAuth2LoginResponse oAuth2Login(OAuth2LoginType type, String code, HttpServletResponse response) {
-        OAuth2LoginInfo oAuth2LoginInfo = findOAuth2LoginType(type);
-        ResponseEntity<String> accessTokenRes = oAuth2LoginInfo.requestAccessToken(code);
+    public OAuth2LoginResponse oAuth2Login(OAuthLoginRequest request, HttpServletResponse response) {
+        OAuth2LoginInfo oAuth2LoginInfo = findOAuth2LoginType(request.getType());
+        ResponseEntity<String> accessTokenRes = oAuth2LoginInfo.requestAccessToken(request.getCode());
 
         OAuth2TokenDto oAuth2Token = oAuth2LoginInfo.getAccessToken(accessTokenRes);
 
@@ -67,11 +71,11 @@ public class WebOAuth2Service {
         if(existOwner == null) {
             log.info("첫 로그인 회원");
             oAuth2Account.setRole(AccountRole.USER);
-            oAuth2Account.setSocialType(type);
+            oAuth2Account.setSocialType(request.getType());
             oAuth2Repository.save(oAuth2Account);
         }
 
-        TokenDto tokenDto = jwtTokenUtil.createToken(oAuth2Account.getEmail());
+        TokenDto tokenDto = jwtTokenUtil.createToken(request.getPlatform(), oAuth2Account.getEmail());
 
         redisTemplate.opsForValue().set("RT:" + oAuth2Account.getEmail(), tokenDto.getRefreshToken(), tokenDto.getRefreshTokenExpirationTime(), TimeUnit.MILLISECONDS);
 
@@ -81,12 +85,12 @@ public class WebOAuth2Service {
     }
 
     @Transactional
-    public TokenDto refreshAccessToken(String accessToken, String refreshToken) {
-        if (!jwtTokenUtil.tokenValidataion(refreshToken)) {
+    public TokenDto refreshAccessToken(String refreshToken) {
+        if (!jwtTokenUtil.tokenValidation(refreshToken)) {
             throw new RuntimeException("Invalid Refresh Token");
         }
 
-        String email = jwtTokenUtil.getEmailFromToken(accessToken);
+        String email = jwtTokenUtil.getEmailFromToken(refreshToken);
 
         String getRefreshToken = (String)redisTemplate.opsForValue().get("RT:" + email);
 
@@ -97,17 +101,17 @@ public class WebOAuth2Service {
             throw new IllegalArgumentException("Refresh Token 정보가 일치하지 않습니다");
         }
 
-        TokenDto tokenDto = jwtTokenUtil.createToken(email);
+        String new_refreshToken = jwtTokenUtil.recreateAccessToken(email);
 
 
-        redisTemplate.opsForValue().set("RT:" + email, tokenDto.getRefreshToken(), tokenDto.getRefreshTokenExpirationTime(), TimeUnit.MILLISECONDS);
+        redisTemplate.opsForValue().set("RT:" + email, new_refreshToken, REFRESH_TIME, TimeUnit.MILLISECONDS);
 
-        return tokenDto;
+        return TokenDto.builder().refreshToken(new_refreshToken).refreshTokenExpirationTime(REFRESH_TIME).build();
     }
 
     @Transactional
     public String logout(String accessToken) {
-        if(!jwtTokenUtil.tokenValidataion(accessToken)) {
+        if(!jwtTokenUtil.tokenValidation(accessToken)) {
             throw new IllegalArgumentException("Invalid Access Token");
         }
 

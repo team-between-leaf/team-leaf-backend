@@ -1,9 +1,7 @@
 package com.team.leaf.user.account.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import com.team.leaf.user.account.dto.request.jwt.Platform;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -22,6 +20,9 @@ public class RefreshToken {
     private String refreshToken;
     @NotBlank
     private String userEmail;
+
+    @Enumerated(EnumType.STRING)
+    private Platform platform;
 
     public RefreshToken(String token, String email) {
         this.refreshToken = token;

@@ -1,6 +1,7 @@
 package com.team.leaf.user.account.controller;
 
 import com.team.leaf.user.account.dto.request.oauth.OAuth2LoginType;
+import com.team.leaf.user.account.dto.request.oauth.OAuthLoginRequest;
 import com.team.leaf.user.account.dto.response.OAuth2LoginResponse;
 import com.team.leaf.user.account.dto.response.TokenDto;
 import com.team.leaf.user.account.exception.ApiResponse;
@@ -23,8 +24,8 @@ public class WebOAuth2Controller {
 
     @PostMapping("/login")
     @Operation(summary = "[웹 전용] 소셜 로그인 로그인 API")
-    public OAuth2LoginResponse login(@RequestParam(name = "type") OAuth2LoginType type, @RequestParam(name = "code") String code, HttpServletResponse response) {
-        return oAuthService.oAuth2Login(type, code, response);
+    public OAuth2LoginResponse login(@RequestBody OAuthLoginRequest request, HttpServletResponse response) {
+        return oAuthService.oAuth2Login(request, response);
     }
 
     @DeleteMapping("/logout")
@@ -35,10 +36,9 @@ public class WebOAuth2Controller {
 
     @PostMapping("/issue/token")
     @Operation(summary= "Access Token 갱신 API")
-    public ResponseEntity<?> refreshAccessToken(@RequestHeader(name = JwtTokenUtil.ACCESS_TOKEN, required = false) String accessToken,
-                                                @RequestHeader(name = JwtTokenUtil.REFRESH_TOKEN, required = false) String refreshToken) {
+    public ResponseEntity<?> refreshAccessToken(@RequestBody @RequestHeader(name = JwtTokenUtil.REFRESH_TOKEN, required = false) String refreshToken) {
         try {
-            TokenDto newTokenDto = oAuthService.refreshAccessToken(accessToken, refreshToken);
+            TokenDto newTokenDto = oAuthService.refreshAccessToken(refreshToken);
 
             HttpHeaders headers = new HttpHeaders();
             headers.add(JwtTokenUtil.ACCESS_TOKEN, newTokenDto.getAccessToken());

@@ -28,7 +28,6 @@ public class JwtTokenFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-
         String cookie_accessToken = getTokenByRequest(request, "accessToken");
         String cookie_refreshToken = getTokenByRequest(request, "refreshToken");
         String accessToken = jwtTokenUtil.getHeaderToken(request, "Access");
@@ -45,7 +44,7 @@ public class JwtTokenFilter extends OncePerRequestFilter {
 
     private void processSecurity(String accessToken, String refreshToken, HttpServletResponse response) {
         if (accessToken != null) {
-            if (!jwtTokenUtil.tokenValidataion(accessToken)) {
+            if (!jwtTokenUtil.tokenValidation(accessToken)) {
                 jwtExceptionHandler(response, "AccessToken Expired", HttpStatus.BAD_REQUEST);
                 return;
             }
@@ -57,8 +56,10 @@ public class JwtTokenFilter extends OncePerRequestFilter {
         } else if (refreshToken != null) {
             if (!jwtTokenUtil.refreshTokenValidation(refreshToken)) {
                 jwtExceptionHandler(response, "RefreshToken Expired", HttpStatus.BAD_REQUEST);
+
                 return;
             }
+
             setAuthentication(jwtTokenUtil.getEmailFromToken(refreshToken));
         }
     }
@@ -73,7 +74,7 @@ public class JwtTokenFilter extends OncePerRequestFilter {
         response.setContentType("application/json");
         try {
             String json = new ObjectMapper().writeValueAsString(new GlobalResDto(msg, status.value()));
-            response.getWriter().write(json);
+            // response.getWriter().write(json);
         } catch (Exception e) {
             log.error(e.getMessage());
         }

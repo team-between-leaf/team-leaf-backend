@@ -1,5 +1,7 @@
 package com.team.leaf.user.account.jwt;
 
+import com.team.leaf.user.account.dto.request.jwt.JwtLoginRequest;
+import com.team.leaf.user.account.dto.request.jwt.Platform;
 import com.team.leaf.user.account.dto.response.TokenDto;
 import com.team.leaf.user.account.entity.AccountDetail;
 import com.team.leaf.user.account.entity.AccountRole;
@@ -25,6 +27,7 @@ import java.security.Key;
 import java.time.Duration;
 import java.util.Base64;
 import java.util.Date;
+import java.util.List;
 import java.util.Optional;
 
 
@@ -40,8 +43,8 @@ public class JwtTokenUtil {
     //private static final String AUTHORITIES_KEY = "auth";
     public static final String ACCESS_TOKEN = "Authorization";
     public static final String REFRESH_TOKEN = "refresh_token";
-    private static final long ACCESS_TIME = Duration.ofMinutes(30).toMillis(); // 만료시간 30분
-    private static final long REFRESH_TIME = Duration.ofDays(14).toMillis(); // 만료시간 2주
+    public static final long ACCESS_TIME = Duration.ofMinutes(30).toMillis(); // 만료시간 30분
+    public static final long REFRESH_TIME = Duration.ofDays(14).toMillis(); // 만료시간 2주
 
     @Value("${jwt.secret}")
     private String secretKey;
@@ -57,7 +60,7 @@ public class JwtTokenUtil {
         return type.equals("Access") ? request.getHeader(ACCESS_TOKEN) : request.getHeader(REFRESH_TOKEN);
     }
 
-    public TokenDto createToken(String email) {
+    public TokenDto createToken(Platform platform, String email) {
         Date date = new Date();
         AccountRole role = getRoleFromEmail(email);
 
@@ -69,13 +72,7 @@ public class JwtTokenUtil {
                 .signWith(SignatureAlgorithm.HS256, key)
                 .compact();
 
-        String refreshToken = Jwts.builder()
-                .setSubject(email)
-                .setExpiration(new Date(date.getTime() + REFRESH_TIME))
-                .setIssuedAt(date)
-                .signWith(SignatureAlgorithm.HS256, key)
-                .compact();
-
+        String refreshToken = createRefreshToken(platform, email);
 
         return TokenDto.builder()
                 .accessToken(accessToken)
@@ -84,10 +81,28 @@ public class JwtTokenUtil {
                 .build();
     }
 
+    public String recreateAccessToken(String refreshToken) {
+        if(!tokenValidation(refreshToken)) {
+            throw new RuntimeException("변조된 토큰입니다.");
+        }
+        Date date = new Date();
+        String email = getEmailFromToken(refreshToken);
+        AccountRole role = getRoleFromEmail(email);
+
+        return Jwts.builder()
+                .setSubject(email)
+                .claim("role", role.name())
+                .setExpiration(new Date(date.getTime() + ACCESS_TIME))
+                .setIssuedAt(date)
+                .signWith(SignatureAlgorithm.HS256, key)
+                .compact();
+    }
+
     //refreshToken 검증
-    public Boolean tokenValidataion(String token) {
+    public Boolean tokenValidation(String token) {
         try {
             Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token);
+
             return true;
         } catch (SecurityException | MalformedJwtException e) {
             log.error("Invalid JWT signature");
@@ -107,10 +122,32 @@ public class JwtTokenUtil {
         }
     }
 
-    public Boolean refreshTokenValidation(String token) {
+    public String createRefreshToken(Platform platform, String email) {
+        List<RefreshToken> refreshToken = refreshTokenRepository.findByUserEmailAndPlatformOrderByRefreshId(email, platform);
+        Date date = new Date();
 
+        if(platform == Platform.FLUTTER) {
+            if(refreshToken.size() >= 3) {
+                refreshTokenRepository.delete(refreshToken.get(0));
+            }
+        }
+        else if(platform == Platform.WEB) {
+            if(refreshToken.size() >= 1) {
+                refreshTokenRepository.delete(refreshToken.get(0));
+            }
+        }
+
+        return Jwts.builder()
+                .setSubject(email)
+                .setExpiration(new Date(date.getTime() + REFRESH_TIME))
+                .setIssuedAt(date)
+                .signWith(SignatureAlgorithm.HS256, key)
+                .compact();
+    }
+
+    public Boolean refreshTokenValidation(String token) {
         //1차 검증
-        if (!tokenValidataion(token)) return false;
+        if (!tokenValidation(token)) return false;
 
         //DB에 저장된 토큰 비교
         Optional<RefreshToken> refreshToken = refreshTokenRepository.findByUserEmail(getEmailFromToken(token));

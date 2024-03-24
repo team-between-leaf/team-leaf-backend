@@ -1,17 +1,13 @@
 package com.team.leaf.user.account.service;
 
 import com.team.leaf.user.account.config.SecurityConfig;
-import com.team.leaf.user.account.dto.request.jwt.AdditionalJoinInfoRequest;
-import com.team.leaf.user.account.dto.request.jwt.JwtJoinRequest;
-import com.team.leaf.user.account.dto.request.jwt.JwtLoginRequest;
-import com.team.leaf.user.account.dto.request.jwt.UpdateJwtAccountDto;
+import com.team.leaf.user.account.dto.request.jwt.*;
 import com.team.leaf.user.account.dto.response.LoginAccountDto;
 import com.team.leaf.user.account.dto.response.TokenDto;
 import com.team.leaf.user.account.entity.*;
 import com.team.leaf.user.account.jwt.JwtTokenUtil;
 import com.team.leaf.user.account.repository.AccountRepository;
 import com.team.leaf.user.account.repository.InterestCategoryRepository;
-import com.team.leaf.user.account.repository.RefreshTokenRepository;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -24,13 +20,15 @@ import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static com.team.leaf.user.account.jwt.JwtTokenUtil.REFRESH_TIME;
+import static com.team.leaf.user.account.jwt.JwtTokenUtil.REFRESH_TOKEN;
+
 @Service
 @RequiredArgsConstructor
 public class AccountService {
 
     private final AccountRepository accountRepository;
     private final CommonService commonService;
-    private final RefreshTokenRepository refreshTokenRepository;
     private final InterestCategoryRepository interestCategoryRepository;
     private final JwtTokenUtil jwtTokenUtil;
     private final SecurityConfig jwtSecurityConfig;
@@ -133,7 +131,7 @@ public class AccountService {
         }
 
         else {
-            TokenDto tokenDto = jwtTokenUtil.createToken(request.getEmail());
+            TokenDto tokenDto = jwtTokenUtil.createToken(request.getPlatform(), request.getEmail());
 
             redisTemplate.opsForValue().set("RT:" + request.getEmail(), tokenDto.getRefreshToken(), tokenDto.getRefreshTokenExpirationTime(), TimeUnit.MILLISECONDS);
 
@@ -206,7 +204,7 @@ public class AccountService {
 
     @Transactional
     public String logout(String accessToken) {
-        if(!jwtTokenUtil.tokenValidataion(accessToken)) {
+        if(!jwtTokenUtil.tokenValidation(accessToken)) {
             throw new IllegalArgumentException("Invalid Access Token");
         }
 
@@ -225,7 +223,7 @@ public class AccountService {
 
     @Transactional
     public TokenDto refreshAccessToken(String refreshToken) {
-        if (!jwtTokenUtil.tokenValidataion(refreshToken)) {
+        if (!jwtTokenUtil.tokenValidation(refreshToken) && jwtTokenUtil.refreshTokenValidation(refreshToken)) {
             throw new RuntimeException("Invalid Refresh Token");
         }
 
@@ -240,12 +238,12 @@ public class AccountService {
             throw new IllegalArgumentException("Refresh Token 정보가 일치하지 않습니다");
         }
 
-        TokenDto tokenDto = jwtTokenUtil.createToken(email);
+        String new_refreshToken = jwtTokenUtil.recreateAccessToken(email);
 
 
-        redisTemplate.opsForValue().set("RT:" + email, tokenDto.getRefreshToken(), tokenDto.getRefreshTokenExpirationTime(), TimeUnit.MILLISECONDS);
+        redisTemplate.opsForValue().set("RT:" + email, new_refreshToken, REFRESH_TIME , TimeUnit.MILLISECONDS);
 
-        return tokenDto;
+        return TokenDto.builder().refreshToken(refreshToken).refreshTokenExpirationTime(REFRESH_TIME).build();
     }
 
 }

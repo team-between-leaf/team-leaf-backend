@@ -17,13 +17,13 @@ spring:
   jpa:
     database: mysql
     database-platform: org.hibernate.dialect.MySQLDialect
-    show-sql: true
+#    show-sql: true
     hibernate:
       ddl-auto: update
-    properties:
-      hibernate:
-        show_sql: true
-        format_sql: true
+#    properties:
+#      hibernate:
+#        show_sql: true
+#        format_sql: true
 
   #social
   security:
