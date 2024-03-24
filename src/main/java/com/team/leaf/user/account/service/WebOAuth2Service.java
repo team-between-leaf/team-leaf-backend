@@ -84,8 +84,8 @@ public class WebOAuth2Service {
     }
 
     @Transactional
-    public TokenDto refreshAccessToken(String refreshToken) {
-        if (!jwtTokenUtil.tokenValidation(refreshToken)) {
+    public TokenDto refreshAccessToken(Platform platform, String refreshToken) {
+        if (!jwtTokenUtil.refreshTokenValidation(refreshToken, platform)) {
             throw new RuntimeException("Invalid Refresh Token");
         }
 
