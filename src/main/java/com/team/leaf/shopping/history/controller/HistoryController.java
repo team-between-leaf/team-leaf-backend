@@ -36,9 +36,9 @@ public class HistoryController {
 
     @GetMapping
     public ApiResponse getAllHistory(@LogIn @Parameter(hidden = true) AccountDetail accountDetail) {
-        historyService.getAllHistory(accountDetail);
+        List<History> result = historyService.getAllHistory(accountDetail);
 
-        return new ApiResponse(ApiResponseStatus.SUCCESS);
+        return new ApiResponse(result);
     }
 
     @DeleteMapping

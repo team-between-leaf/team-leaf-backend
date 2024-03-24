@@ -26,8 +26,8 @@ public class HistoryService {
     public void addHistory(HistoryRequest request, AccountDetail accountDetail) {
         History history = History.createHistory(request.getContent(), accountDetail);
 
-        List<History> historyList = historyRepository.findAllByAccountDetailOrderByHistoryId(accountDetail);
-        for (int i = 10; i < historyList.size(); i++) {
+        List<History> historyList = historyRepository.findAllByAccountDetail(accountDetail);
+        for (int i = 0; i < historyList.size() - 9; i++) {
             historyRepository.delete(historyList.get(i));
         }
 
@@ -35,9 +35,10 @@ public class HistoryService {
     }
 
     public List<History> getAllHistory(AccountDetail accountDetail) {
-        return historyRepository.findAllByAccountDetailOrderByHistoryId(accountDetail);
+        return historyRepository.findAllByAccountDetailOrderByHistoryIdDesc(accountDetail);
     }
 
+    @Transactional
     public void deleteAllHistory(AccountDetail accountDetail) {
         historyRepository.deleteAllByAccountDetail(accountDetail);
     }
