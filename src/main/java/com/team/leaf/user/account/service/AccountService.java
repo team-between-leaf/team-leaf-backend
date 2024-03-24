@@ -68,14 +68,31 @@ public class AccountService {
         }
 
         // 닉네임 중복 체크
-        if (accountRepository.existsByNickname(request.getNickname())) {
-            throw new RuntimeException("이미 존재하는 닉네임입니다.");
-        }
+        String nickName = createNickName(request.getEmail());
 
-        AccountDetail accountDetail = AccountDetail.joinAccount(request.getEmail(),jwtSecurityConfig.passwordEncoder().encode(request.getPassword()), request.getPhone(), request.getNickname());
+        AccountDetail accountDetail = AccountDetail.joinAccount(request.getEmail(),jwtSecurityConfig.passwordEncoder().encode(request.getPassword()), request.getPhone(), nickName);
         accountRepository.save(accountDetail);
         return "Success Join";
+    }
 
+    private String createNickName(String email) {
+        while(true) {
+            String random = generateRandomNumber(7);
+
+            String randomNickName = email.substring(0 , 4) + random;
+            if(!accountRepository.existsByNickname(randomNickName)) {
+                return randomNickName;
+            }
+        }
+    }
+
+    private String generateRandomNumber(int N) {
+        String result = "";
+        for(int i = 0; i < N; i++) {
+            result += Integer.toString((int) ((Math.random()*10000)%10));
+        }
+
+        return result;
     }
 
     public String joinWithAdditionalInfo(AdditionalJoinInfoRequest request) {
