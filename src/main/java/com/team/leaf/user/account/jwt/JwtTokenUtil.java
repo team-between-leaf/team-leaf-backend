@@ -82,10 +82,6 @@ public class JwtTokenUtil {
     }
 
     public String recreateAccessToken(String refreshToken) {
-        if(!tokenValidation(refreshToken)) {
-            throw new RuntimeException("변조된 토큰입니다.");
-        }
-
         Date date = new Date();
         String email = getEmailFromToken(refreshToken);
         AccountRole role = getRoleFromEmail(email);
