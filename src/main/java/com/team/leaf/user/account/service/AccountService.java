@@ -21,8 +21,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static com.team.leaf.user.account.jwt.JwtTokenUtil.REFRESH_TIME;
-import static com.team.leaf.user.account.jwt.JwtTokenUtil.REFRESH_TOKEN;
+import static com.team.leaf.user.account.jwt.JwtTokenUtil.*;
 
 @Service
 @RequiredArgsConstructor
@@ -225,7 +224,7 @@ public class AccountService {
 
     @Transactional
     public TokenDto refreshAccessToken(Platform platform, String refreshToken) {
-        if (jwtTokenUtil.refreshTokenValidation(refreshToken, platform)) {
+        if (!jwtTokenUtil.refreshTokenValidation(refreshToken, platform)) {
             throw new RuntimeException("Invalid Refresh Token");
         }
 
@@ -240,12 +239,11 @@ public class AccountService {
             throw new IllegalArgumentException("Refresh Token 정보가 일치하지 않습니다");
         }
 
-        String new_refreshToken = jwtTokenUtil.recreateAccessToken(email);
+        String new_accessToken = jwtTokenUtil.recreateAccessToken(refreshToken);
 
+        redisTemplate.opsForValue().set("RT:" + email, new_accessToken, ACCESS_TIME , TimeUnit.MILLISECONDS);
 
-        redisTemplate.opsForValue().set("RT:" + email, new_refreshToken, REFRESH_TIME , TimeUnit.MILLISECONDS);
-
-        return TokenDto.builder().refreshToken(refreshToken).refreshTokenExpirationTime(REFRESH_TIME).build();
+        return TokenDto.builder().accessToken(new_accessToken).refreshTokenExpirationTime(ACCESS_TIME).build();
     }
 
 }

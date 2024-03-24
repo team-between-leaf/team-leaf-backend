@@ -78,10 +78,15 @@ public class CommonService {
     }
 
     public void setHeader(HttpServletResponse response, TokenDto tokenDto) {
-        response.addHeader(JwtTokenUtil.ACCESS_TOKEN, tokenDto.getAccessToken());
-        response.addHeader(JwtTokenUtil.REFRESH_TOKEN, tokenDto.getRefreshToken());
-        response.addHeader("Set-Cookie", createAccessToken(tokenDto.getAccessToken()).toString());
-        response.addHeader("Set-Cookie", createRefreshToken(tokenDto.getRefreshToken()).toString());
+        if(tokenDto.getRefreshToken() != null) {
+            response.addHeader(JwtTokenUtil.REFRESH_TOKEN, tokenDto.getRefreshToken());
+            response.addHeader("Set-Cookie", createRefreshToken(tokenDto.getRefreshToken()).toString());
+        }
+
+        if(tokenDto.getAccessToken() != null) {
+            response.addHeader(JwtTokenUtil.ACCESS_TOKEN, tokenDto.getAccessToken());
+            response.addHeader("Set-Cookie", createAccessToken(tokenDto.getAccessToken()).toString());
+        }
     }
 
     public static ResponseCookie createAccessToken(String access) {

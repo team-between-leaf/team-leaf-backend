@@ -69,7 +69,7 @@ public class JwtTokenUtil {
                 .claim("role", role.name())
                 .setExpiration(new Date(date.getTime() + ACCESS_TIME))
                 .setIssuedAt(date)
-                .signWith(SignatureAlgorithm.HS256, key)
+                .signWith(key, SignatureAlgorithm.HS256)
                 .compact();
 
         String refreshToken = createRefreshToken(platform, email);
@@ -95,15 +95,14 @@ public class JwtTokenUtil {
                 .claim("role", role.name())
                 .setExpiration(new Date(date.getTime() + ACCESS_TIME))
                 .setIssuedAt(date)
-                .signWith(SignatureAlgorithm.HS256, key )
+                .signWith(key, SignatureAlgorithm.HS256)
                 .compact();
     }
 
     //refreshToken 검증
     public Boolean tokenValidation(String token) {
         try {
-            //Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token);
-            Jwts.parser().setSigningKey(token).parseClaimsJws(token);
+            Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token);
 
             return true;
         } catch (SecurityException | MalformedJwtException e) {
@@ -158,7 +157,7 @@ public class JwtTokenUtil {
 
         //DB에 저장된 토큰 비교
         Optional<RefreshToken> refreshToken = refreshTokenRepository.findByRefreshTokenAndPlatformOrderByRefreshId(token, platform);
-
+        System.out.println("있나요? " + refreshToken.isPresent());
         return refreshToken.isPresent() && token.equals(refreshToken.get().getRefreshToken());
     }
 
