@@ -15,17 +15,13 @@ public class JwtJoinRequest {
     @NotBlank(message = "비밀번호 확인이 비어있습니다.")
     private String passwordCheck;
 
-    @NotBlank(message = "닉네임이 비어있습니다.")
-    private String nickname;
-
     @NotBlank(message = "핸드폰 번호가 비어있습니다.")
     private String phone;
 
-    public JwtJoinRequest(String email, String password, String passwordCheck, String nickname, String phone) {
+    public JwtJoinRequest(String email, String password, String passwordCheck, String phone) {
         this.email = email;
         this.password = password;
         this.passwordCheck = passwordCheck;
-        this.nickname = nickname;
         this.phone = phone;
     }
 

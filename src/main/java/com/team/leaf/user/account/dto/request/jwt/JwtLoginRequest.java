@@ -10,4 +10,6 @@ public class JwtLoginRequest {
     private String email;
     private String password;
 
+    private Platform platform;
+
 }

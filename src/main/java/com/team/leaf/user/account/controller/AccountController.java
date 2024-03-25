@@ -2,16 +2,16 @@ package com.team.leaf.user.account.controller;
 
 import com.team.leaf.user.account.dto.common.DuplicateEmailRequest;
 import com.team.leaf.user.account.dto.common.DuplicatePhoneRequest;
-import com.team.leaf.user.account.dto.request.jwt.AdditionalJoinInfoRequest;
-import com.team.leaf.user.account.dto.request.jwt.JwtJoinRequest;
-import com.team.leaf.user.account.dto.request.jwt.JwtLoginRequest;
+import com.team.leaf.user.account.dto.request.jwt.*;
 import com.team.leaf.user.account.dto.response.LoginAccountDto;
 import com.team.leaf.user.account.dto.response.TokenDto;
 import com.team.leaf.user.account.exception.ApiResponse;
+import com.team.leaf.user.account.jwt.JwtTokenFilter;
 import com.team.leaf.user.account.jwt.JwtTokenUtil;
 import com.team.leaf.user.account.service.AccountService;
 import com.team.leaf.user.account.service.CommonService;
 import io.swagger.v3.oas.annotations.Operation;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -52,22 +52,30 @@ public class AccountController {
 
     @DeleteMapping("/logout")
     @Operation(summary = "자체 로그인 로그아웃 API")
-    public ApiResponse<String> logout(@RequestHeader(name = JwtTokenUtil.ACCESS_TOKEN, required = false) String accessToken) {
-        return new ApiResponse<>(accountService.logout(accessToken));
+    public ApiResponse<String> logout(@RequestHeader(name = JwtTokenUtil.ACCESS_TOKEN) String accessToken,
+                                      @RequestHeader(name = JwtTokenUtil.REFRESH_TOKEN) String refreshToken) {
+        return new ApiResponse<>(accountService.logout(accessToken, refreshToken));
     }
 
     @PostMapping("/issue/token")
     @Operation(summary= "Access Token 갱신 API")
-    public ResponseEntity<?> refreshAccessToken(@RequestHeader(name = JwtTokenUtil.ACCESS_TOKEN, required = false) String accessToken,
-                                                @RequestHeader(name = JwtTokenUtil.REFRESH_TOKEN, required = false) String refreshToken) {
+    public ResponseEntity<?> refreshAccessToken(HttpServletRequest request, HttpServletResponse response,
+                                                @RequestHeader(name = JwtTokenUtil.REFRESH_TOKEN, required = false) String refreshToken,
+                                                @RequestBody PlatformRequest platformRequest ) {
         try {
-            TokenDto newTokenDto = accountService.refreshAccessToken(accessToken, refreshToken);
+            TokenDto newTokenDto = null;
 
-            HttpHeaders headers = new HttpHeaders();
-            headers.add(JwtTokenUtil.ACCESS_TOKEN, newTokenDto.getAccessToken());
-            headers.add(JwtTokenUtil.REFRESH_TOKEN, newTokenDto.getRefreshToken());
+            if(refreshToken == null) {
+                String cookie_refreshToken = JwtTokenFilter.getTokenByRequest(request, "refreshToken");
 
-            return new ResponseEntity<>(headers, HttpStatus.OK);
+                newTokenDto = accountService.refreshAccessToken(platformRequest.getPlatform(), cookie_refreshToken);
+            } else {
+                newTokenDto = accountService.refreshAccessToken(platformRequest.getPlatform(), refreshToken);
+            }
+
+            commonService.setHeader(response, newTokenDto);
+
+            return new ResponseEntity<>(newTokenDto, HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>("Failed to refresh access token", HttpStatus.UNAUTHORIZED);
         }

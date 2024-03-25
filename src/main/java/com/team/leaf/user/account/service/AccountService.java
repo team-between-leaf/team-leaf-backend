@@ -1,10 +1,7 @@
 package com.team.leaf.user.account.service;
 
 import com.team.leaf.user.account.config.SecurityConfig;
-import com.team.leaf.user.account.dto.request.jwt.AdditionalJoinInfoRequest;
-import com.team.leaf.user.account.dto.request.jwt.JwtJoinRequest;
-import com.team.leaf.user.account.dto.request.jwt.JwtLoginRequest;
-import com.team.leaf.user.account.dto.request.jwt.UpdateJwtAccountDto;
+import com.team.leaf.user.account.dto.request.jwt.*;
 import com.team.leaf.user.account.dto.response.LoginAccountDto;
 import com.team.leaf.user.account.dto.response.TokenDto;
 import com.team.leaf.user.account.entity.*;
@@ -24,17 +21,19 @@ import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static com.team.leaf.user.account.jwt.JwtTokenUtil.*;
+
 @Service
 @RequiredArgsConstructor
 public class AccountService {
 
     private final AccountRepository accountRepository;
     private final CommonService commonService;
-    private final RefreshTokenRepository refreshTokenRepository;
     private final InterestCategoryRepository interestCategoryRepository;
     private final JwtTokenUtil jwtTokenUtil;
     private final SecurityConfig jwtSecurityConfig;
     private final RedisTemplate redisTemplate;
+    private final RefreshTokenRepository refreshTokenRepository;
 
     private void validatePassword(String password) {
         String passwordRegex = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=!])(?=\\S+$).{9,22}$";
@@ -68,14 +67,31 @@ public class AccountService {
         }
 
         // 닉네임 중복 체크
-        if (accountRepository.existsByNickname(request.getNickname())) {
-            throw new RuntimeException("이미 존재하는 닉네임입니다.");
-        }
+        String nickName = createNickName(request.getEmail());
 
-        AccountDetail accountDetail = AccountDetail.joinAccount(request.getEmail(),jwtSecurityConfig.passwordEncoder().encode(request.getPassword()), request.getPhone(), request.getNickname());
+        AccountDetail accountDetail = AccountDetail.joinAccount(request.getEmail(),jwtSecurityConfig.passwordEncoder().encode(request.getPassword()), request.getPhone(), nickName);
         accountRepository.save(accountDetail);
         return "Success Join";
+    }
 
+    private String createNickName(String email) {
+        while(true) {
+            String random = generateRandomNumber(7);
+
+            String randomNickName = email.substring(0 , 4) + random;
+            if(!accountRepository.existsByNickname(randomNickName)) {
+                return randomNickName;
+            }
+        }
+    }
+
+    private String generateRandomNumber(int N) {
+        String result = "";
+        for(int i = 0; i < N; i++) {
+            result += Integer.toString((int) ((Math.random()*10000)%10));
+        }
+
+        return result;
     }
 
     public String joinWithAdditionalInfo(AdditionalJoinInfoRequest request) {
@@ -105,7 +121,6 @@ public class AccountService {
 
     @Transactional
     public LoginAccountDto login(JwtLoginRequest request, HttpServletResponse response) {
-
         // 이메일로 유저 정보 확인
         AccountDetail accountDetail = accountRepository.findByEmail(request.getEmail()).orElseThrow(() ->
                 new RuntimeException("사용자를 찾을 수 없습니다."));
@@ -116,7 +131,7 @@ public class AccountService {
         }
 
         else {
-            TokenDto tokenDto = jwtTokenUtil.createToken(request.getEmail());
+            TokenDto tokenDto = jwtTokenUtil.createToken(request.getPlatform(), request.getEmail());
 
             redisTemplate.opsForValue().set("RT:" + request.getEmail(), tokenDto.getRefreshToken(), tokenDto.getRefreshTokenExpirationTime(), TimeUnit.MILLISECONDS);
 
@@ -188,8 +203,8 @@ public class AccountService {
     }
 
     @Transactional
-    public String logout(String accessToken) {
-        if(!jwtTokenUtil.tokenValidataion(accessToken)) {
+    public String logout(String accessToken, String refreshToken) {
+        if(!jwtTokenUtil.tokenValidation(accessToken)) {
             throw new IllegalArgumentException("Invalid Access Token");
         }
 
@@ -200,19 +215,20 @@ public class AccountService {
         }
 
         Long expiration = jwtTokenUtil.getExpiration(accessToken);
-        redisTemplate.opsForValue().set(accessToken, "logout", expiration, TimeUnit.MILLISECONDS);
+        refreshTokenRepository.deleteByRefreshToken(refreshToken);
 
+        redisTemplate.opsForValue().set(accessToken, "logout", expiration, TimeUnit.MILLISECONDS);
 
         return "Success Logout";
     }
 
     @Transactional
-    public TokenDto refreshAccessToken(String accessToken, String refreshToken) {
-        if (!jwtTokenUtil.tokenValidataion(refreshToken)) {
+    public TokenDto refreshAccessToken(Platform platform, String refreshToken) {
+        if (!jwtTokenUtil.refreshTokenValidation(refreshToken, platform)) {
             throw new RuntimeException("Invalid Refresh Token");
         }
 
-        String email = jwtTokenUtil.getEmailFromToken(accessToken);
+        String email = jwtTokenUtil.getEmailFromToken(refreshToken);
 
         String getRefreshToken = (String)redisTemplate.opsForValue().get("RT:" + email);
 
@@ -223,12 +239,11 @@ public class AccountService {
             throw new IllegalArgumentException("Refresh Token 정보가 일치하지 않습니다");
         }
 
-        TokenDto tokenDto = jwtTokenUtil.createToken(email);
+        String new_accessToken = jwtTokenUtil.recreateAccessToken(refreshToken);
 
+        redisTemplate.opsForValue().set("RT:" + email, new_accessToken, ACCESS_TIME , TimeUnit.MILLISECONDS);
 
-        redisTemplate.opsForValue().set("RT:" + email, tokenDto.getRefreshToken(), tokenDto.getRefreshTokenExpirationTime(), TimeUnit.MILLISECONDS);
-
-        return tokenDto;
+        return TokenDto.builder().accessToken(new_accessToken).refreshTokenExpirationTime(ACCESS_TIME).build();
     }
 
 }
