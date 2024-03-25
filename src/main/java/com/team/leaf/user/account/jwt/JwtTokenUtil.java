@@ -69,7 +69,7 @@ public class JwtTokenUtil {
                 .claim("role", role.name())
                 .setExpiration(new Date(date.getTime() + ACCESS_TIME))
                 .setIssuedAt(date)
-                .signWith(key, SignatureAlgorithm.HS256)
+                .signWith(SignatureAlgorithm.HS256, key)
                 .compact();
 
         String refreshToken = createRefreshToken(platform, email);
@@ -91,7 +91,7 @@ public class JwtTokenUtil {
                 .claim("role", role.name())
                 .setExpiration(new Date(date.getTime() + ACCESS_TIME))
                 .setIssuedAt(date)
-                .signWith(key, SignatureAlgorithm.HS256)
+                .signWith(SignatureAlgorithm.HS256, key)
                 .compact();
     }
 
@@ -103,7 +103,6 @@ public class JwtTokenUtil {
             return true;
         } catch (SecurityException | MalformedJwtException e) {
             log.error("Invalid JWT signature");
-            e.printStackTrace();
             return false;
         } catch (ExpiredJwtException e) {
             log.error("Expired JWT");

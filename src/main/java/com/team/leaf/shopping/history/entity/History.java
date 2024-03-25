@@ -1,5 +1,6 @@
 package com.team.leaf.shopping.history.entity;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.team.leaf.user.account.entity.AccountDetail;
 import jakarta.persistence.*;
@@ -7,7 +8,10 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.CreationTimestamp;
 import org.junit.Ignore;
+
+import java.time.LocalDate;
 
 @Entity
 @Getter
@@ -23,6 +27,10 @@ public class History {
     @ManyToOne(fetch = FetchType.LAZY)
     @JsonIgnore
     private AccountDetail accountDetail;
+
+    @CreationTimestamp
+    @JsonFormat(shape = JsonFormat.Shape.STRING , pattern = "yyyy.MM.dd." , timezone = "Asia/Seoul")
+    private LocalDate date;
 
     private String content;
 
