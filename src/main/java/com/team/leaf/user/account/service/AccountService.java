@@ -229,12 +229,6 @@ public class AccountService {
         }
 
         String email = jwtTokenUtil.getEmailFromToken(refreshToken);
-
-        String getRefreshToken = (String)redisTemplate.opsForValue().get("RT:" + email);
-
-        if(ObjectUtils.isEmpty(getRefreshToken)) {
-            throw new IllegalArgumentException("Refresh Token이 존재하지 않습니다");
-        }
         if(!refreshToken.equals(refreshToken)) {
             throw new IllegalArgumentException("Refresh Token 정보가 일치하지 않습니다");
         }
@@ -243,7 +237,7 @@ public class AccountService {
 
         redisTemplate.opsForValue().set("RT:" + email, new_accessToken, ACCESS_TIME , TimeUnit.MILLISECONDS);
 
-        return TokenDto.builder().accessToken(new_accessToken).refreshTokenExpirationTime(ACCESS_TIME).build();
+        return TokenDto.builder().accessToken(new_accessToken).build();
     }
 
 }

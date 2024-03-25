@@ -31,7 +31,7 @@ public class AccountController {
     private final CommonService commonService;
 
     @PostMapping("/join")
-    @Operation(summary= "자체 로그인 회원가입 API")
+    @Operation(summary = "자체 로그인 회원가입 API")
     public ApiResponse<String> join(@RequestBody JwtJoinRequest joinRequest) throws IOException {
 
         return new ApiResponse<>(accountService.join(joinRequest));
@@ -45,7 +45,7 @@ public class AccountController {
     }
 
     @PostMapping("/login")
-    @Operation(summary= "자체 로그인 로그인 API")
+    @Operation(summary = "자체 로그인 로그인 API")
     public ApiResponse<LoginAccountDto> login(@RequestBody @Valid JwtLoginRequest loginRequest, HttpServletResponse response) {
         return new ApiResponse<>(accountService.login(loginRequest, response));
     }
@@ -58,27 +58,23 @@ public class AccountController {
     }
 
     @PostMapping("/issue/token")
-    @Operation(summary= "Access Token 갱신 API")
+    @Operation(summary = "Access Token 갱신 API")
     public ResponseEntity<?> refreshAccessToken(HttpServletRequest request, HttpServletResponse response,
                                                 @RequestHeader(name = JwtTokenUtil.REFRESH_TOKEN, required = false) String refreshToken,
-                                                @RequestBody PlatformRequest platformRequest ) {
-        try {
-            TokenDto newTokenDto = null;
+                                                @RequestBody PlatformRequest platformRequest) {
+        TokenDto newTokenDto = null;
 
-            if(refreshToken == null) {
-                String cookie_refreshToken = JwtTokenFilter.getTokenByRequest(request, "refreshToken");
+        if (refreshToken == null) {
+            String cookie_refreshToken = JwtTokenFilter.getTokenByRequest(request, "refreshToken");
 
-                newTokenDto = accountService.refreshAccessToken(platformRequest.getPlatform(), cookie_refreshToken);
-            } else {
-                newTokenDto = accountService.refreshAccessToken(platformRequest.getPlatform(), refreshToken);
-            }
-
-            commonService.setHeader(response, newTokenDto);
-
-            return new ResponseEntity<>(newTokenDto, HttpStatus.OK);
-        } catch (Exception e) {
-            return new ResponseEntity<>("Failed to refresh access token", HttpStatus.UNAUTHORIZED);
+            newTokenDto = accountService.refreshAccessToken(platformRequest.getPlatform(), cookie_refreshToken);
+        } else {
+            newTokenDto = accountService.refreshAccessToken(platformRequest.getPlatform(), refreshToken);
         }
+
+        commonService.setHeader(response, newTokenDto);
+
+        return new ResponseEntity<>(newTokenDto, HttpStatus.OK);
     }
 
     @PostMapping("/email")
