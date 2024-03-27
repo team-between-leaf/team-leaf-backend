@@ -1,10 +1,13 @@
 package com.team.leaf.shopping.coupon.dto;
 
+import com.team.leaf.shopping.coupon.entity.Coupon;
 import com.team.leaf.shopping.coupon.entity.DownloadCondition;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.Setter;
 
 @Getter
+@Setter
 @AllArgsConstructor
 public class CouponResponse {
 
@@ -17,5 +20,9 @@ public class CouponResponse {
     private double saleRate;
 
     private DownloadCondition downloadCondition;
+
+    public CouponResponse() {
+
+    }
 
 }
