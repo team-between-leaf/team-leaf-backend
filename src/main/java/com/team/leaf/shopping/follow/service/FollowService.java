@@ -9,6 +9,9 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Service
 @RequiredArgsConstructor
 public class FollowService {
@@ -35,5 +38,20 @@ public class FollowService {
                 .orElseThrow(() -> new RuntimeException("not found User"));
 
         followRepository.deleteByTargetUserAndSelfUser(targetUser, accountDetail);
+    }
+
+    public List<AccountDetail> getFollowingList(AccountDetail accountDetail) {
+        return followRepository.findBySelfUser_AccountId(accountDetail.getUserId())
+                .stream()
+                .map(Follow::getTargetUser)
+                .collect(Collectors.toList());
+    }
+
+    // 팔로워 목록 조회 메서드
+    public List<AccountDetail> getFollowerList(AccountDetail accountDetail) {
+        return followRepository.findByTargetUser_AccountId(accountDetail.getUserId())
+                .stream()
+                .map(Follow::getSelfUser)
+                .collect(Collectors.toList());
     }
 }
