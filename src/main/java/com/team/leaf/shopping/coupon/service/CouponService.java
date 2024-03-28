@@ -13,6 +13,7 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -51,4 +52,26 @@ public class CouponService {
     public List<CouponResponse> findCouponByUserId(long userId) {
         return couponRepository.findCouponByUserId(userId);
     }
+
+    public List<CouponResponse> findCouponsByAccountUserId(AccountDetail accountDetail) {
+        List<DownloadCoupon> downloadCoupons = downloadCouponRepository.findByAccountDetailUserId(accountDetail.getUserId());
+        List<CouponResponse> couponResponses = new ArrayList<>();
+
+        for (DownloadCoupon downloadCoupon : downloadCoupons) {
+            couponResponses.add(convertToCouponResponse(downloadCoupon.getCoupon()));
+        }
+
+        return couponResponses;
+    }
+
+    private CouponResponse convertToCouponResponse(Coupon coupon) {
+        CouponResponse couponResponse = new CouponResponse();
+        couponResponse.setCouponId(coupon.getCouponId());
+        couponResponse.setCouponName(coupon.getCouponName());
+        couponResponse.setSaleRate(coupon.getSaleRate());
+        couponResponse.setProductId(coupon.getProduct().getProductId());
+        couponResponse.setDownloadCondition(coupon.getDownloadCondition());
+        return couponResponse;
+    }
+
 }

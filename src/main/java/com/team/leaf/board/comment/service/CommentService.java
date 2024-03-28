@@ -1,7 +1,9 @@
 package com.team.leaf.board.comment.service;
 
+import com.team.leaf.board.board.dto.BoardResponse;
 import com.team.leaf.board.board.entity.Board;
 import com.team.leaf.board.board.repository.BoardRepository;
+import com.team.leaf.board.board.service.BoardService;
 import com.team.leaf.board.comment.dto.CommentRequest;
 import com.team.leaf.board.comment.dto.CommentResponse;
 import com.team.leaf.board.comment.entity.Comment;
@@ -13,6 +15,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -56,6 +59,18 @@ public class CommentService {
                 .orElseThrow(()->new RuntimeException("Not Found Board"));
         comment.updateComment(commentRequest);
         return "Success updateComment";
+    }
+
+    public List<BoardResponse> findBoardsByCommentWriter(String nickname) {
+        AccountDetail accountDetail = accountRepository.findByNickname(nickname)
+                .orElseThrow(() -> new RuntimeException("Not Found Nickname"));
+        List<Comment> comments = commentRepository.findByWriter(accountDetail);
+        List<Board> boards = comments.stream()
+                .map(comment -> comment.getBoard())
+                .collect(Collectors.toList());
+        return boards.stream()
+                .map(board -> BoardService.convertToBoardResponse(board))
+                .collect(Collectors.toList());
     }
 
 }

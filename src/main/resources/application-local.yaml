@@ -33,20 +33,20 @@ spring:
           google:
             client-id: 33639085746-931tb5adt8panu5jmgqqvvkfcen3vj12.apps.googleusercontent.com
             client-secret: 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
-            redirect-uri: 'http://localhost:8080/login/oauth2/code/google'
+            redirect-uri: 'http://localhost:5173/auth/google'
             authorization-grant-type: authorization_code
             scope: email, profile
 
           naver:
             client-id: kywqO7CA0wq7EL3fmr9P
             client-secret: XVVn1U5fCZ
-            redirect-uri: 'http://localhost:8080/login/oauth2/code/naver'
+            redirect-uri: 'http://localhost:5173/auth/naver'
             authorization-grant-type: authorization_code
             scope: name, account_email, birthday, birthyear, mobile
 
           kakao:
             client-id: 3c03055df153324beeade3cecb61260b
-            redirect-uri: 'http://localhost:8080/login/oauth2/code/kakao'
+            redirect-uri: 'http://localhost:5173/auth/kakao'
             client-authentication-method: client_secret_post
             authorization-grant-type: authorization_code
             scope: account_email, name, birthday, birthyear, phone_number

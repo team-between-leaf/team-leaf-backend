@@ -28,14 +28,14 @@ import static com.team.leaf.user.account.jwt.JwtTokenUtil.*;
 public class AccountService {
 
     private final AccountRepository accountRepository;
+    private final RefreshTokenRepository refreshTokenRepository;
     private final CommonService commonService;
     private final InterestCategoryRepository interestCategoryRepository;
     private final JwtTokenUtil jwtTokenUtil;
     private final SecurityConfig jwtSecurityConfig;
     private final RedisTemplate redisTemplate;
-    private final RefreshTokenRepository refreshTokenRepository;
 
-    private void validatePassword(String password) {
+    public void validatePassword(String password) {
         String passwordRegex = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=!])(?=\\S+$).{9,22}$";
         Pattern pwPattern = Pattern.compile(passwordRegex);
         Matcher pwMatcher = pwPattern.matcher(password);
@@ -142,64 +142,6 @@ public class AccountService {
 
             return new LoginAccountDto(accountDetail.getEmail(),access_token,refresh_token);
         }
-    }
-
-    @Transactional
-    public String updateUser(String email, UpdateJwtAccountDto accountDto) {
-        AccountDetail accountDetail = accountRepository.findByEmail(email).orElseThrow(() ->
-                new RuntimeException("사용자를 찾을 수 없습니다."));
-
-        if (accountDto.getEmail() != null && !accountDto.getEmail().isEmpty()) {
-            commonService.validateEmail(accountDto.getEmail());
-            accountDetail.setEmail(accountDto.getEmail());
-        }
-
-        if (accountDto.getPassword() != null && !accountDto.getPassword().isEmpty()) {
-            validatePassword(accountDto.getPassword());
-            String encodedPassword = jwtSecurityConfig.passwordEncoder().encode(accountDto.getPassword());
-            accountDetail.setPassword(encodedPassword);
-        }
-
-        if (accountDto.getName() != null && !accountDto.getName().isEmpty()) {
-            accountDetail.setName(accountDto.getName());
-        }
-
-        if (accountDto.getNickname() != null && !accountDto.getNickname().isEmpty()) {
-            accountDetail.setNickname(accountDto.getNickname());
-        }
-
-        if (accountDto.getPhone() != null && !accountDto.getPhone().isEmpty()) {
-            commonService.validatePhone(accountDetail.getPhone());
-            accountDetail.setPhone(accountDto.getPhone());
-        }
-
-        if (accountDto.getBirthday() != null && !accountDto.getBirthday().isEmpty()) {
-            accountDetail.setBirthday(accountDto.getBirthday());
-        }
-
-        if (accountDto.getBirthyear() != null && !accountDto.getBirthyear().isEmpty()) {
-            accountDetail.setBirthyear(accountDto.getBirthyear());
-        }
-
-        if (accountDto.getUniversityName() != null && !accountDto.getUniversityName().isEmpty()) {
-            accountDetail.setUniversityName(accountDto.getUniversityName());
-        }
-
-        if (accountDto.getShippingAddress() != null && !accountDto.getShippingAddress().isEmpty()) {
-            accountDetail.setShippingAddress(accountDto.getShippingAddress());
-        }
-
-        if (accountDto.getSchoolAddress() != null && !accountDto.getSchoolAddress().isEmpty()) {
-            accountDetail.setSchoolAddress(accountDto.getSchoolAddress());
-        }
-
-        if (accountDto.getWorkAddress() != null && !accountDto.getWorkAddress().isEmpty()) {
-            accountDetail.setWorkAddress(accountDto.getWorkAddress());
-        }
-
-        accountRepository.save(accountDetail);
-
-        return "Success updateUser";
     }
 
     @Transactional

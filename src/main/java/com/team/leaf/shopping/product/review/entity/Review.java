@@ -1,18 +1,18 @@
 package com.team.leaf.shopping.product.review.entity;
 
 import com.team.leaf.shopping.product.product.entity.Product;
+import com.team.leaf.shopping.product.review.dto.KeywordRating;
 import com.team.leaf.user.account.entity.AccountDetail;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
+import org.springframework.data.annotation.LastModifiedDate;
 
 import java.time.LocalDateTime;
 
 @Entity
 @Getter
+@Setter
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
@@ -36,5 +36,23 @@ public class Review {
     private Product product;
 
     private String orderType;
+
+    @Enumerated(EnumType.STRING)
+    private KeywordRating deliveryRating;
+
+    @Enumerated(EnumType.STRING)
+    private KeywordRating packagingRating;
+
+    @Enumerated(EnumType.STRING)
+    private KeywordRating qualityRating;
+
+
+    public void updateReview(int score, String content, KeywordRating deliveryRating, KeywordRating packagingRating, KeywordRating qualityRating) {
+        this.score = score;
+        this.content = content;
+        this.deliveryRating = deliveryRating;
+        this.packagingRating = packagingRating;
+        this.qualityRating = qualityRating;
+    }
 
 }

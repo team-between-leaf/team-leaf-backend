@@ -4,7 +4,6 @@ import com.team.leaf.user.account.dto.request.jwt.Platform;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
